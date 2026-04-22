@@ -6,6 +6,10 @@ bold_font = "Segoe UI Black"
 
 normal_font = "Segoe UI"
 
+dark_background = "#2b2b2b"
+
+dark_foreground= "#1B1B1B"
+
 # Source - https://stackoverflow.com/a/53717785
 # Posted by jimmiesrustled, modified by community. See post 'Timeline' for change history
 # Retrieved 2026-04-12, License - CC BY-SA 4.0

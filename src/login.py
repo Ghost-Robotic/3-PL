@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from PIL import Image
+from PIL import Image, ImageTk
 import style
 
 # initial landing page where users are directed to login
@@ -17,18 +17,22 @@ class Login(ctk.CTkFrame):
             if self.help_label.winfo_viewable():
                 self.help_label.grid_remove()
             else:
-                self.help_label.grid()       
+                self.help_label.grid()   
+                
+            
+        container = ctk.CTkFrame(self)
+        container.grid(row=0, column=0)
         
         # logo above login box
-        dark_logo = Image.open("assets\\3-PL.png")
+        dark_logo = Image.open("assets\\3-PL-700x400.png")
         self.logo = ctk.CTkImage(dark_image=dark_logo, size=(dark_logo.width/3,dark_logo.height/3))      
-        logo_label = ctk.CTkLabel(self, image=self.logo, text="")
+        logo_label = ctk.CTkLabel(container, image=self.logo, text="")
         logo_label.grid(row=0, column=0)
         
         
         # login Box: cosmetic container that holds login widgets
-        bg_frame = ctk.CTkFrame(self, fg_color="#05ac71", corner_radius=40, border_width=7, border_color="#262626", bg_color="#2b2b2b")
-        bg_frame.grid(row=1, column=0, ipadx=30, ipady=30)
+        bg_frame = ctk.CTkFrame(container, fg_color="#05ac71", corner_radius=40, border_width=7, border_color="#262626", bg_color="#2b2b2b")
+        bg_frame.grid(row=1, column=0, ipadx=30, ipady=30, sticky="")
         bg_frame.rowconfigure(0, weight=1)
         bg_frame.columnconfigure(0, weight=1)
         #bg_frame.grid_propagate(False)
@@ -42,7 +46,7 @@ class Login(ctk.CTkFrame):
         # login_cont.grid_propagate(False)
         
         # welcome text
-        welcome_label = ctk.CTkLabel(login_cont, text="Welcome", font=("Segoe UI Black",30), text_color="#31acf3")
+        welcome_label = ctk.CTkLabel(login_cont, text="Welcome", font=("Segoe UI Black",30), text_color="#f3e031")
         info_label = ctk.CTkLabel(login_cont, text="Enter your organisation's login details below", font=("Segoe UI",20, "bold"), wraplength=300)
         welcome_label.grid(row=0, column=0, columnspan=2)
         info_label.grid(row=1, column=0, columnspan=2)
@@ -76,7 +80,7 @@ class Login(ctk.CTkFrame):
         help_command = lambda : help()
         help_button = ctk.CTkButton(login_cont, command=help_command, 
                                     width=30, height=30, corner_radius=15, 
-                                    text="?", font=("Segoe UI Black", 20), text_color="black", 
+                                    text="?", font=("Segoe UI Black", 20), text_color="black", anchor="center",
                                     fg_color="#ffffff", hover_color="#d4d4d4")
         help_button.grid(row=5, column=1, sticky="e")
         

@@ -1,8 +1,8 @@
 import customtkinter as ctk
-from tkinter import ttk
 from os import system, name
 from login import Login 
 from dashboard import Dashboard
+
 
 
 class App(ctk.CTk):
@@ -15,21 +15,30 @@ class App(ctk.CTk):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         
-        # create container that all content will be placed in
+        # create container that all content will be placed in        
         container = ctk.CTkFrame(self, bg_color="#2b2b2b")
         container.grid(row = 0, column = 0, sticky="nsew")
         container.rowconfigure(0, weight=1)
         container.columnconfigure(0, weight=1)
+
+        # bg_img = Image.open("assets\\bg.png")
+        # self.bg = ctk.CTkImage(dark_image=bg_img, size=(self.winfo_screenwidth(),self.winfo_screenheight()))      
+        # bg_label = ctk.CTkLabel(container, image=self.bg, text="")
+        # bg_label.grid(row=0, column=0)
         
+
         self.frames = {}
                    
         for page in (Login, Dashboard):
             frame = page(container, self)
             self.frames[page] = frame 
-            frame.grid(row = 0, column = 0)
+            frame.grid(row=0, column=0, sticky="nsew")       
+            frame.rowconfigure(0, weight=1)
+            frame.columnconfigure(0, weight=1)
           
            
-        self.display_page(Login)   
+        #self.display_page(Login)  
+        self.display_page(Dashboard)  
            
         #login = Login(container, self)
         #login.pack(expand=True, anchor="center")
