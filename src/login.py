@@ -31,14 +31,14 @@ class Login(ctk.CTkFrame):
         
         
         # login Box: cosmetic container that holds login widgets
-        bg_frame = ctk.CTkFrame(container, fg_color="#05ac71", corner_radius=40, border_width=7, border_color="#262626", bg_color="#2b2b2b")
+        bg_frame = ctk.CTkFrame(container, fg_color=style.main_green, corner_radius=40, border_width=7, border_color="#262626", bg_color="#2b2b2b")
         bg_frame.grid(row=1, column=0, ipadx=30, ipady=30, sticky="")
         bg_frame.rowconfigure(0, weight=1)
         bg_frame.columnconfigure(0, weight=1)
         #bg_frame.grid_propagate(False)
         
         # container inside login box that holds content, used to prevent widgets overlapping corners of login box
-        login_cont = ctk.CTkFrame(bg_frame, width=300, fg_color="#05ac71", corner_radius=-1)
+        login_cont = ctk.CTkFrame(bg_frame, width=300, fg_color=style.main_green, corner_radius=-1)
         login_cont.grid(row=0, column=0)
         login_cont.rowconfigure(0, weight=1)
         login_cont.columnconfigure(0, weight=1)
