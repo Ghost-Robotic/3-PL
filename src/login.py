@@ -6,7 +6,7 @@ import random
 class Login(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background) 
-        self.images = ["assets/c-1L-dark.png", "assets/c1-indx.png", "assets/h2d.png", "assets/ht90-dark.png", 
+        self.images = ["assets/c-1L-dark2.png", "assets/c1-indx.png", "assets/h2d.png", "assets/ht90-dark.png", 
                        "assets/P1S.png", "assets/xl.png", "assets/xl2.png", "assets/xl5-transp.png"]
         
         def show_error():
