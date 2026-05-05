@@ -2,6 +2,8 @@ main_blue = "#00a2ff"
 
 main_green = "#05ac71"
 
+grey = "#585858"
+
 bold_font = "Segoe UI Black"
 
 normal_font = "Segoe UI"
