@@ -37,8 +37,8 @@ class App(ctk.CTk):
             frame.columnconfigure(0, weight=1)
           
            
-        #self.display_page(Login)  
-        self.display_page(Dashboard)  
+        self.display_page(Login)  
+        #self.display_page(Dashboard)  
            
         #login = Login(container, self)
         #login.pack(expand=True, anchor="center")
@@ -49,7 +49,5 @@ class App(ctk.CTk):
         page = self.frames[frame]
         page.tkraise()
         
-        
-
-app = App()
-app.mainloop()
+    def start(self):    
+        self.mainloop()
