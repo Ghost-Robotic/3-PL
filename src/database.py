@@ -68,21 +68,32 @@ import sqlite3 as sql
 # database.add_column('age', 'INTEGER')
 # database.add_column('hello', 'TEXT')
          
-class Users(Table):
+class Users():
     def __init__(self, database):
-        self.connection =sql.connect(database)
+        self.connection =sql.connect(database, autocommit=True)
+        self.connection.execute('PRAGMA forgeign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            user_id INTEGER PRIMARY KEY,
-            f_name TEXT,
-            l_name TEXT,
-            access_level INTEGER,
+            user_id TEXT PRIMARY KEY CHECK(length(user_id)=6),
+            password TEXT,
+            salt TEXT,
+            f_name TEXT NOT NULL,
+            l_name TEXT NOT NULL,
+            access_level INTEGER NOT NULL CHECK(access_level BETWEEN 1 AND 5),
             group_id INTEGER
             )''')  
         
-class Groups(Table):
+    def view_table(self):
+        for row in self.cursor.execute('SELECT user_id, f_name, l_name, access_level, group_id FROM users'):
+            print(row)
+        
+    def create_user(self, user_id, f_name, l_name, password=None, salt=None, access_level=1, group_id=None):
+        self.cursor.execute('INSERT INTO users VALUES (?,?,?,?,?)', (user_id, password, salt, f_name, l_name, access_level, group_id))
+
+        
+class Groups():
     def __init__(self, database):
         self.connection =sql.connect(database)
         self.cursor = self.connection.cursor()
