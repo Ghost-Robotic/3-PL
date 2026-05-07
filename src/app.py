@@ -8,13 +8,14 @@ from dashboard import Dashboard
 class App(ctk.CTk):
     def __init__(self, *args, **kwargs):
         ctk.CTk.__init__(self, *args, **kwargs)
-        self.bind("<Configure>", self.on_resize)
+        #self.bind("<Configure>", self.on_resize)
         # configure window
         self.title("3-PL")
-        system(self.after(1, self.wm_state ,('zoomed')) if name == 'nt' else self.attributes('-zoomed', True))
+        #system(self.after(1, self.wm_state ,('zoomed')) if name == 'nt' else self.attributes('-zoomed', True))
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.minsize(576, 324)
+        self.wm_aspect(16,9,16,9)
         
         # create container that all content will be placed in        
         container = ctk.CTkFrame(self, bg_color="#2b2b2b")
@@ -50,9 +51,10 @@ class App(ctk.CTk):
         page = self.frames[frame]
         page.tkraise()
         
-    def start(self):    
+    def start(self): 
+        self.after(1, lambda : self.state('zoomed'))
         self.mainloop()
         
     def on_resize(self, event):
-        pass
-        #print(f"{event.width}x{event.height}")
+        #pass
+        print(f"{event.width}x{event.height}")
