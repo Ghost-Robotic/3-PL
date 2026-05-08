@@ -2,11 +2,12 @@ import customtkinter as ctk
 from os import system, name
 from login import Login 
 from dashboard import Dashboard
-
-
+from database import Users
 
 class App(ctk.CTk):
     def __init__(self, *args, **kwargs):
+        self.access = False
+        self.current_user = None
         ctk.CTk.__init__(self, *args, **kwargs)
         #self.bind("<Configure>", self.on_resize)
         # configure window
@@ -39,17 +40,18 @@ class App(ctk.CTk):
             frame.columnconfigure(0, weight=1)
           
            
-        self.display_page(Login)  
-        #self.display_page(Dashboard)  
+        #self.display_page(Login)  
+        #self.display_page(Dashboard)
+        self.display_page(list(self.frames)[0])
            
-        #login = Login(container, self)
-        #login.pack(expand=True, anchor="center")
-        #login.place(in_=container, anchor = "c", relx=.5, rely=.5)
-        #login.tkraise()
+        self.setup_database()
+    
+    def setup_database(self):
+        self.accounts = Users(r"src\database\log.db")
         
-    def display_page(self, frame):
+    def display_page(self, frame=None, index=None):
         page = self.frames[frame]
-        page.tkraise()
+        page.tkraise()                        
         
     def start(self): 
         self.after(1, lambda : self.state('zoomed'))
