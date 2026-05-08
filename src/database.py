@@ -86,11 +86,33 @@ class Users():
             )''')  
         
     def view_table(self):
-        for row in self.cursor.execute('SELECT user_id, f_name, l_name, access_level, group_id FROM users'):
+        """prints entire table
+        """
+        for row in self.cursor.execute('SELECT user_id, password, salt, f_name, l_name, access_level, group_id FROM users'):
             print(row)
         
     def create_user(self, user_id, f_name, l_name, password=None, salt=None, access_level=1, group_id=None):
-        self.cursor.execute('INSERT INTO users VALUES (?,?,?,?,?)', (user_id, password, salt, f_name, l_name, access_level, group_id))
+        self.cursor.execute('INSERT INTO users VALUES (?,?,?,?,?,?,?)', (user_id, password, salt, f_name, l_name, access_level, group_id))
+        
+    def fetch_password(self, user_id):
+        """fetch hashed password and salt
+        Args:
+            user_id (Int): User unique id
+        Raises:
+            Exception: User not found
+        Returns:
+            tuple: password, salt
+        """     
+        results = self.cursor.execute('''SELECT password, salt 
+                                      FROM users 
+                                      WHERE user_id = ?''', (user_id,))
+        row = results.fetchone()
+        if row:
+            password, salt = row
+            return password, salt
+        else:
+            raise Exception("User not found")
+
 
         
 class Groups():
