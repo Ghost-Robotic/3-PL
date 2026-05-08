@@ -2,17 +2,15 @@ import customtkinter as ctk
 from PIL import Image, ImageTk
 import style
 import random
-import hash_utils
-import database
+import helpers.hash_utils as hsh
 # initial landing page where users are directed to login
 class Login(ctk.CTkFrame):
     def __init__(self, parent, controller):
+        self.controller = controller
         #controller.bind("<Configure>", controller.on_resize)
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background) 
         self.images = ["assets/c-1L-dark2.png", "assets/c1-indx.png", "assets/h2d.png", "assets/ht90-dark.png", 
                        "assets/P1S.png", "assets/xl.png", "assets/xl2.png", "assets/xl5-transp.png"]
-        
-
                 
             
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
@@ -63,12 +61,14 @@ class Login(ctk.CTkFrame):
         self.username = ctk.CTkEntry(login_cont, width=300, height=25, placeholder_text="ID number", font=(style.normal_font,18,"bold"))
         self.username.grid(row=3, column=0, padx=5, pady=(2,10), sticky="w")
         self.after(700, lambda : self.username.focus())
+        self.username.bind("<Return>", lambda event : self.submit())
         
         # password entry
         pass_label = ctk.CTkLabel(login_cont, text="Password:", font=("Segoe UI Black",18))
         pass_label.grid(row=4, column = 0, padx=5, pady=(10,2), sticky="w")
         self.password = ctk.CTkEntry(login_cont, width=300, height=25, show="•", placeholder_text="Password", font=(style.normal_font,18,"bold"))
         self.password.grid(row=5, column=0, padx=5, pady=(2, 10), sticky="w")
+        self.password.bind("<Return>", lambda event : self.submit())
         
         # error message
         self.error_label = ctk.CTkLabel(login_cont, text="*Invalid username or password", font=(style.bold_font, 16), text_color="#ff0000")
@@ -77,7 +77,7 @@ class Login(ctk.CTkFrame):
         
 
         # submit button
-        self.login_button =ctk.CTkButton(login_cont, command=(lambda : self.show_error()), width=100, height=40, text="Login", font=("Segoe UI Black", 25), fg_color="#00a2ff")
+        self.login_button =ctk.CTkButton(login_cont, command=(lambda : self.submit()), width=100, height=40, text="Login", font=("Segoe UI Black", 25), fg_color="#00a2ff")
         self.login_button.grid(row=7, column=0, columnspan=2, pady=10)
         
         # help button
@@ -121,4 +121,25 @@ class Login(ctk.CTkFrame):
         self.after(5000, self.change_img)
         
     def submit(self):
-        pass
+        if self.username.get() != "" and self.password.get() != "":
+            try:
+                # gets corresponding hashed password and salt for given user_id
+                matched_password, salt = self.controller.accounts.fetch_password(self.username.get())
+                # hashes given password
+                hashed_password = hsh.hash(password=self.password.get(), salt=salt)
+                # check if given password matches stored password
+                if matched_password == hashed_password:
+                    self.clear_username()
+                    self.clear_password()
+                    self.hide_error()
+                    self.controller.access = True
+                    self.controller.current_access = self.username.get()
+                    self.controller.display_page(list(self.controller.frames)[1])
+                    print("match")
+                else:
+                    raise Exception("Incorrect Password")
+            except:
+                self.clear_password()
+                self.show_error()
+        else:
+            print("no input detected")
