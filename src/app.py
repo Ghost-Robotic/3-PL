@@ -57,6 +57,10 @@ class App(ctk.CTk):
         self.after(1, lambda : self.state('zoomed'))
         self.mainloop()
         
+    def login(self):
+        if self.access == True and len(self.current_user) == 6:
+            self.display_page(Dashboard)
+        
     def on_resize(self, event):
         #pass
         print(f"{event.width}x{event.height}")

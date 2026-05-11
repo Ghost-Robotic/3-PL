@@ -129,13 +129,14 @@ class Login(ctk.CTkFrame):
                 hashed_password = hsh.hash(password=self.password.get(), salt=salt)
                 # check if given password matches stored password
                 if matched_password == hashed_password:
+                    self.controller.access = True
+                    self.controller.current_user = self.username.get()
+                    self.controller.login()
+                    #self.controller.display_page(list(self.controller.frames)[1])
+                    print("match")
                     self.clear_username()
                     self.clear_password()
                     self.hide_error()
-                    self.controller.access = True
-                    self.controller.current_access = self.username.get()
-                    self.controller.display_page(list(self.controller.frames)[1])
-                    print("match")
                 else:
                     raise Exception("Incorrect Password")
             except:
