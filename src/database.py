@@ -88,7 +88,7 @@ class Users():
     def view_table(self):
         """prints entire table
         """
-        for row in self.cursor.execute('SELECT user_id, password, salt, f_name, l_name, access_level, group_id FROM users'):
+        for row in self.cursor.execute('SELECT * FROM users'):
             print(row)
         
     def create_user(self, user_id, f_name, l_name, password=None, salt=None, access_level=1, group_id=None):
@@ -113,11 +113,11 @@ class Users():
         else:
             raise Exception("User not found")
 
-
         
 class Groups():
     def __init__(self, database):
-        self.connection =sql.connect(database)
+        self.connection =sql.connect(database, autocommit=True)
+        self.connection.execute('PRAGMA forgeign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
@@ -125,46 +125,94 @@ class Groups():
             group_id INTEGER PRIMARY KEY,
             group_name TEXT
             )''') 
+        
+    def view_table(self):
+        """prints entire table
+        """
+        for row in self.cursor.execute('SELECT * FROM users'):
+            print(row)
+            
+    def add_group(self, group_name):
+         self.cursor.execute('INSERT INTO logs VALUES (?,?)',(None,group_name))
 
 class PrinterModels:
     def __init__(self, database):
-        self.connection =sql.connect(database)
+        self.connection =sql.connect(database, autocommit=True)
+        self.connection.execute('PRAGMA forgeign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS printer_models (
             model_id INTEGER PRIMARY KEY,
-            model_name TEXT
+            model_name TEXT,
+            brand TEXT,
+            multimaterial BOOLEAN,
+            filament_id
             )''') 
+        
+    def view_table(self):
+        """prints entire table
+        """
+        for row in self.cursor.execute('SELECT * FROM users'):
+            print(row)
+            
+    def add_printer_model(self, model_name, brand, multimaterial=False, filament_id=None):
+         self.cursor.execute('INSERT INTO logs VALUES (?,?,?,?,?)',(None,model_name,brand,multimaterial,filament_id))
 
 class Printers:
     def __init__(self, database):
-        self.connection =sql.connect(database)
+        self.connection =sql.connect(database, autocommit=True)
+        self.connection.execute('PRAGMA forgeign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS printers (
             printer_id INTEGER PRIMARY KEY,
+            model_id INTEGER,
+            group_id INTEGER
             )''') 
+        
+    def view_table(self):
+        """prints entire table
+        """
+        for row in self.cursor.execute('SELECT * FROM users'):
+            print(row)
+            
+    def add_printer(self, model_id, group_id=None):
+         self.cursor.execute('INSERT INTO logs VALUES (?,?,?)',(None,model_id,group_id))
 
 class Filaments:
     def __init__(self, database):
-        self.connection =sql.connect(database)
+        self.connection =sql.connect(database, autocommit=True)
+        self.connection.execute('PRAGMA forgeign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Users (
-            user_id INTEGER PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS filaments (
+            filament_id INTEGER PRIMARY KEY,
+            material TEXT,
+            weight INTEGER,
+            amount INTEGER
             )''') 
+        
+    def view_table(self):
+        """prints entire table
+        """
+        for row in self.cursor.execute('SELECT * FROM users'):
+            print(row)
+            
+    def add_filament(self, material, weight, amount):
+         self.cursor.execute('INSERT INTO logs VALUES (?,?,?,?)', (None,material,weight,amount))
 
 class Logs:
     def __init__(self, database):
-        self.connection =sql.connect(database)
+        self.connection =sql.connect(database, autocommit=True)
+        self.connection.execute('PRAGMA forgeign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Users (
-            print_id INTEGER PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS logs (
+            print_id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT,
             print_name TEXT,
             gcode TEXT,
@@ -175,6 +223,32 @@ class Logs:
             filament_id INTEGER,
             approval BOOLEAN,
             approver_id INTEGER
-            successful BOOLEAN
+            successful BOOLEAN,
+            
+            FOREIGN KEY (user_id)
+                REFERENCES users (user_id),
+                
+            FOREIGN KEY (printer_id)
+                REFERENCES users (printer_id),
+                
+            FOREIGN KEY (filament_id)
+                REFERENCES users (filament_id),
+                
+            FOREIGN KEY (approver_id)
+                REFERENCES users (user_id)
             )''') 
         
+    def view_table(self):
+        """prints entire table
+        """
+        for row in self.cursor.execute('SELECT * FROM users'):
+            print(row)
+            
+    def add_log(self, user_id, print_name, gcode, duration, weight, printer_id=None, filament_id=None, approval=None, approver_id=None, successful=None):
+        self.cursor.execute('SELECT datetime("now","localtime")')
+        datetime = self.cursor.fetchone()
+        
+        self.cursor.execute('INSERT INTO logs VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',(None,user_id,print_name,gcode,duration,weight,datetime,printer_id,filament_id,approval,approver_id,successful))
+    
+    def get_datetime(self):
+        pass
