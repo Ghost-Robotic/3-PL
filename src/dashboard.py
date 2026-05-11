@@ -11,30 +11,13 @@ class Dashboard(ctk.CTkFrame):
     def __init__(self, parent, controller):
         ctk.CTkFrame.__init__(self, parent, fg_color="#2b2b2b")
         
+        # navigation bar
         nav_container= ctk.CTkFrame(self, fg_color=style.dark_background, corner_radius=30, bg_color=style.dark_background)
         # nav_container.grid(row=0, column=0, padx=0, pady=(0,0))
         nav_container.pack(side="top", pady=(30,0))
         
-        page_container = ctk.CTkFrame(self)
-        #page_container.grid(row=1, column=0, sticky="nsew")
-        #page_container.rowconfigure(0, weight=1)
-        #page_container.columnconfigure(0, weight=1)
-        page_container.pack(side="top", fill="both", expand=True)
-        
-        box = ctk.CTkFrame(page_container, corner_radius=30, fg_color="#1B1B1B")
-        # box.grid(row=0, column=0, sticky="nsew", padx=80, pady=80)
-
-        # box.place(relwidth=0.9, relheight=0.85, relx=.5, rely=.5, anchor="center")
-        box.pack(side="top", padx=(40,40), pady=(0,40), fill="both", expand=True)
-        box.rowconfigure(0, weight=1)
-        box.columnconfigure(0, weight=1)       
-        
-        #nav_bar = ctk.CTkFrame(nav_container, fg_color="#FF0000")
-        #nav_bar.place(relwidth=1, relheight=0.5)
-        #nav_bar.grid(row=0, column=0, sticky="new")
         
         logo = ImageTk.PhotoImage((Image.open("assets\\3-PL-700x400.png")).resize((140,80), Image.LANCZOS))
-        
         logo_button = ctk.CTkButton(nav_container, command=(lambda : self.set_page("home")), 
                                     image=logo, anchor="center", text="", 
                                     corner_radius=0, fg_color=style.dark_background,
@@ -61,7 +44,15 @@ class Dashboard(ctk.CTkFrame):
                                     fg_color=style.dark_background, hover_color=style.dark_foreground, corner_radius=0)
         self.manage_button.pack(side='left', fill="y", expand=True)
         
+        # page
+        page_container = ctk.CTkFrame(self)
+        page_container.pack(side="top", fill="both", expand=True)
         
+        box = ctk.CTkFrame(page_container, corner_radius=30, fg_color=style.dark_foreground)
+        box.pack(side="top", padx=(40,40), pady=(0,40), fill="both", expand=True)
+        box.rowconfigure(0, weight=1)
+        box.columnconfigure(0, weight=1)   
+                
         self.pages = {}      
         for page in (Home, Add, Log, Manage):
             frame = page(box, self)
