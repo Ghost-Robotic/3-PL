@@ -1,3 +1,5 @@
+from turtle import title
+
 import customtkinter as ctk
 import style
 import shutil
@@ -8,6 +10,8 @@ class Add(ctk.CTkFrame):
         self.gcode_source = None
         self.file_name = ctk.StringVar()
         self.print_name = ctk.StringVar()
+        self.duration = ctk.IntVar()
+        self.weight = ctk.StringVar()
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
@@ -15,18 +19,53 @@ class Add(ctk.CTkFrame):
         container.grid_columnconfigure(0, weight=5)
         container.grid_columnconfigure(1, weight=2)
         container.grid_rowconfigure(0, weight=1)
-        
+       
+#================================================================================================== 
         # left side of form
         l_input_frame = ctk.CTkFrame(container, fg_color=style.dark_foreground)
         l_input_frame.grid(row=0, column=0, sticky='nsew')
-        l_input_frame.columnconfigure(1, weight=1)
+        l_input_frame.columnconfigure(0, weight=1)
         
-        name_label = ctk.CTkLabel(l_input_frame, text="Print Name:", font=(style.normal_font, 25, "bold"), text_color="white")
+        title_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
+        title_frame.grid(row=0,column=0, sticky="we",pady=(0,20))
+        title_frame.columnconfigure(1, weight=1)
+        name_label = ctk.CTkLabel(title_frame, text="Print Name:", font=(style.normal_font, 25, "bold"), text_color="white")
         name_label.grid(row=0, column=0, padx=(0,20))
-        self.print_title = ctk.CTkEntry(l_input_frame, textvariable=self.print_name,
+        self.print_title = ctk.CTkEntry(title_frame, textvariable=self.print_name,
                                    font=(style.normal_font, 25), text_color="#f5f5f5", border_color=style.grey)
         self.print_title.grid(row=0, column=1, sticky="ew")
         
+# =================================================================================================       
+        # set print duration
+        self.hours = ctk.IntVar()
+        self.mins = ctk.IntVar()
+        self.slider_duration = ctk.IntVar()
+        
+        duration_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
+        duration_frame.grid(row=1, column=0)
+        duration_label = ctk.CTkLabel(duration_frame, text="Print Duration:", font=(style.normal_font, 20, "bold"), text_color="white")
+        duration_label.grid(row=0, column=0, padx=(0,20))
+        
+        duration_hours = ctk.CTkEntry(duration_frame, textvariable=self.hours,justify="center",
+                                      font=(style.normal_font, 20), width=(16*3+4))
+        duration_hours.grid(row=0, column=1)
+        duration_hours.bind("<KeyRelease>", lambda a:self.convert_dur_entry(a))
+        hr_label = ctk.CTkLabel(duration_frame, text="Hrs", font=(style.normal_font, 16, "bold"))
+        hr_label.grid(row=0, column=2, padx=(0,10))
+        
+        duration_minutes = ctk.CTkEntry(duration_frame, textvariable=self.mins,justify="center",
+                                      font=(style.normal_font, 20), width=(16*2+4))
+        duration_minutes.grid(row=0, column=3)
+        duration_minutes.bind("<KeyRelease>", lambda a:self.convert_dur_entry(a))
+        min_label = ctk.CTkLabel(duration_frame, text="Mins", font=(style.normal_font, 16, "bold"))
+        min_label.grid(row=0, column=4)
+        
+        self.duration_slider = ctk.CTkSlider(duration_frame, variable=self.slider_duration, 
+                                             from_=0, to=2880, number_of_steps=576, width=300,
+                                             command=lambda minutes: self.convert_slider(minutes))
+        self.duration_slider.grid(row=1, column=0, columnspan=5, pady=(6,0))
+        
+#=====================================================================================================        
         # right side of form
         r_input_frame = ctk.CTkFrame(container, fg_color=style.dark_foreground)
         r_input_frame.grid(row=0, column=1, sticky='nsew')
@@ -38,14 +77,14 @@ class Add(ctk.CTkFrame):
         self.add_file_button = ctk.CTkButton(r_input_frame, width=200, image=plus, height=200, anchor='center', corner_radius=18, text="",
                                     fg_color="#272727", border_color="white", border_width=3, hover_color=style.dark_foreground,
                                     command=(lambda : self.upload_file()))
-        self.add_file_button.grid(row=0, column=0, padx=10, pady=(60,10), sticky="n")
+        self.add_file_button.grid(row=0, column=0, padx=10)
         
         self.file_name = ctk.StringVar(value="*.gcode")
         file_label = ctk.CTkLabel(r_input_frame, textvariable=self.file_name, font=(style.normal_font, 18), text_color="white")
         file_label.grid(row=1, column=0, sticky="n")
         
         # reset form button
-        reset_button = ctk.CTkButton(r_input_frame, width=88, height=45, fg_color="#FF2020",
+        reset_button = ctk.CTkButton(r_input_frame, width=88, height=45, fg_color="#FF2020", hover_color="#FA5C5C",
                                       text="Reset", font=(style.normal_font, 25), text_color="white",
                                       command=(lambda : None))
         reset_button.grid(row=3, column=0, sticky="s", pady=(20,10))
@@ -74,6 +113,18 @@ class Add(ctk.CTkFrame):
             
         
     def submit_form(self):
-        shutil.copy2(self.gcode_source, "src\database\gcode")
+        shutil.copy2(self.gcode_source, r"src\database\gcode")
+        
+    def convert_slider(self, minutes):
+        self.hours.set(int(minutes//60))
+        self.mins.set(int(minutes%60))
+        
+    def convert_dur_entry(self,a):
+        total_duration = self.hours.get()*60 + self.mins.get()
+        if total_duration <= (48*60):
+            self.slider_duration.set(total_duration)
+        else:
+            self.slider_duration.set(48*60)
+        print(self.duration.get())
         
         
