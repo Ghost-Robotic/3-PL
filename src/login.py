@@ -56,9 +56,12 @@ class Login(ctk.CTkFrame):
         #info_label.grid(row=1, column=0, columnspan=2)
 
         # username entry
+        validate_id = self.register(self.validate_id)
+        
         user_label = ctk.CTkLabel(login_cont, text="Username:", font=("Segoe UI Black",18))
         user_label.grid(row=2, column = 0, padx=5, pady=(10,2), sticky="w")
-        self.username = ctk.CTkEntry(login_cont, width=300, height=25, placeholder_text="ID number", font=(style.normal_font,18,"bold"))
+        self.username = ctk.CTkEntry(login_cont, width=300, height=25, placeholder_text="ID number", font=(style.normal_font,18,"bold"),
+                                     validate="key", validatecommand=(validate_id, "%P"))
         self.username.grid(row=3, column=0, padx=5, pady=(2,10), sticky="w")
         self.after(700, lambda : self.username.focus())
         self.username.bind("<Return>", lambda event : self.submit())
@@ -119,6 +122,9 @@ class Login(ctk.CTkFrame):
         img = ImageTk.PhotoImage((Image.open(self.random_img())).resize((700,700), Image.LANCZOS))
         self.img_label.configure(image=img)
         self.after(5000, self.change_img)
+        
+    def validate_id(self, id):
+        return id.isdigit() or id==""
         
     def submit(self):
         if self.username.get() != "" and self.password.get() != "":
