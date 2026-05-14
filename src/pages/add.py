@@ -1,7 +1,5 @@
-from turtle import title
-
 import customtkinter as ctk
-import style
+import src.style as style
 import shutil
 from PIL import Image, ImageTk
 

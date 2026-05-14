@@ -1,10 +1,10 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
-import style
-from pages.home import Home
-from pages.add import Add
-from pages.log import Log
-from pages.manage import Manage
+import src.style as style
+from src.pages.home import Home
+from src.pages.add import Add
+from src.pages.log import Log
+from src.pages.manage import Manage
 # main page that allows users to access sub-pages that contain main app functions
 
 class Dashboard(ctk.CTkFrame):

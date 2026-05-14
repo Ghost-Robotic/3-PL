@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import style
+import src.style as style
 
 class Log(ctk.CTkFrame):
     def __init__(self, parent, controller):
