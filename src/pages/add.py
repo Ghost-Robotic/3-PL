@@ -89,6 +89,29 @@ class Add(ctk.CTkFrame):
         g_label = ctk.CTkLabel(weight_frame, text="g", font=(style.normal_font, 16, "bold"))
         g_label.grid(row=0, column=2, padx=(5,0))
         
+#=====================================================================================================
+        # set printer
+        self.printers = ctk.StringVar()
+        self.printer_list = ["core 1","P1S","H2D"] #command get printer list from database
+        self.avail_printers = ["core 1","P1S","H2D"]
+        
+        printer_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
+        printer_frame.grid(row=2, column=0, sticky="we")
+        printer_label = ctk.CTkLabel(printer_frame, text="Select a printer below::", font=(style.normal_font, 20, "bold"), text_color="white")
+        printer_label.grid(row=0, column=0)
+        self.printer_dropdown = ctk.CTkComboBox(printer_frame, values=self.avail_printers)
+        self.printer_dropdown.bind("<KeyRelease>", lambda e: 
+            self.on_dropdown_update(self.printer_dropdown,self.printer_list,self.avail_printers))
+        self.printer_dropdown.grid(row=1, column=0)
+
+
+#=====================================================================================================
+        # set filament
+        filament_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
+        filament_frame.grid(row=2, column=1, sticky="we")
+        filament_label = ctk.CTkLabel(filament_frame, text="Select a filament below::", font=(style.normal_font, 20, "bold"), text_color="white")
+        filament_label.grid(row=0, column=0)
+        
 #=====================================================================================================        
         # right side of form
         r_input_frame = ctk.CTkFrame(container, fg_color=style.dark_foreground)
@@ -125,7 +148,7 @@ class Add(ctk.CTkFrame):
     def upload_file(self):
         self.gcode_source = ctk.filedialog.askopenfilename(title="Select G-code file",filetypes=[("g-Code files","*.gcode")])
 
-        if self.gcode_source is not "":
+        if self.gcode_source != "":
             grey_plus = ImageTk.PhotoImage((Image.open("assets\plusGrey.png")).resize((100,100), Image.LANCZOS))
             self.add_file_button.configure(fg_color=style.dark_foreground, border_color="#a7a7a7", image=grey_plus)
             
@@ -163,3 +186,16 @@ class Add(ctk.CTkFrame):
     def default_zero(self, event, var):
         var.set(0)
         
+    def on_dropdown_update(self, dropdown, master_list, current_list):
+        value = dropdown.get()
+        new_list = []
+        if current_list != []:
+            current_list = []
+            for i in master_list:
+                if value.lower() in i.lower():
+                    current_list.append(i)
+        else:
+            current_list = master_list
+            
+        
+        dropdown.configure(values=current_list)
