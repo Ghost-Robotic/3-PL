@@ -1,8 +1,10 @@
 import customtkinter as ctk
 from os import system, name
-from login import Login 
-from dashboard import Dashboard
-from database import Users
+from src.login import Login 
+from src.dashboard import Dashboard
+from src.database import Users
+from PIL import Image, ImageTk
+
 
 class App(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -12,6 +14,10 @@ class App(ctk.CTk):
         #self.bind("<Configure>", self.on_resize)
         # configure window
         self.title("3-PL")
+        #logo = Image.open(r"assets\logov4.png")
+        #icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64)]
+        #logo.save('logov4.ico', format='ICO', sizes=icon_sizes)
+        self.iconbitmap(r"assets\logov4.ico")
         #system(self.after(1, self.wm_state ,('zoomed')) if name == 'nt' else self.attributes('-zoomed', True))
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
