@@ -1,8 +1,8 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk
-import style
+import src.style as style
 import random
-import helpers.hash_utils as hsh
+import src.helpers.hash_utils as hsh
 # initial landing page where users are directed to login
 class Login(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -10,7 +10,7 @@ class Login(ctk.CTkFrame):
         #controller.bind("<Configure>", controller.on_resize)
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background) 
         self.images = ["assets/c-1L-dark2.png", "assets/c1-indx.png", "assets/h2d.png", "assets/ht90-dark.png", 
-                       "assets/P1S.png", "assets/xl.png", "assets/xl2.png", "assets/xl5-transp.png"]
+                       "assets/P1S.png", "assets/xl.png", "assets/xl2.png", "assets/xl5-transp.png",r"assets\f4l.png",r"assets\fuse.png"]
                 
             
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
@@ -27,7 +27,7 @@ class Login(ctk.CTkFrame):
         img = ImageTk.PhotoImage((Image.open(self.random_img())).resize((700,700), Image.LANCZOS))
         self.img_label = ctk.CTkButton(img_container, image=img, command=self.change_img, text="", hover=False, fg_color=style.dark_background)
         self.img_label.grid(row=0, column=0)
-        self.after(5000, self.change_img)
+        self.img_cycle = self.after(5000, self.change_img)
         
         # floating widget for login form
         login_widget = ctk.CTkFrame(container, fg_color=style.grey, corner_radius=30)
@@ -119,11 +119,14 @@ class Login(ctk.CTkFrame):
         return random.choice(self.images)
     
     def change_img(self):
+        self.after_cancel(self.img_cycle)
         img = ImageTk.PhotoImage((Image.open(self.random_img())).resize((700,700), Image.LANCZOS))
         self.img_label.configure(image=img)
-        self.after(5000, self.change_img)
+        self.img_cycle = self.after(5000, self.change_img)
         
     def validate_id(self, id):
+        if id == "ID number":
+            return True
         return id.isdigit() or id==""
         
     def submit(self):
