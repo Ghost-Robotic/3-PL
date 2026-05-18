@@ -2,6 +2,7 @@ import customtkinter as ctk
 import src.style as style
 import shutil
 from PIL import Image, ImageTk
+from src.database import Logs
 
 class Add(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -9,7 +10,7 @@ class Add(ctk.CTkFrame):
         self.file_name = ctk.StringVar()
         self.print_name = ctk.StringVar()
         self.duration = ctk.IntVar()
-        self.weight = ctk.StringVar()
+        self.weight = ctk.IntVar()
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
@@ -43,12 +44,12 @@ class Add(ctk.CTkFrame):
         val_min = self.register(self.validate_min)
         
         duration_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
-        duration_frame.grid(row=1, column=0, sticky="we")
+        duration_frame.grid(row=1, column=0, sticky="we", padx=10, pady=10)
         duration_label = ctk.CTkLabel(duration_frame, text="Print Duration:", font=(style.normal_font, 20, "bold"), text_color="white")
         duration_label.grid(row=0, column=0, padx=(0,20))
         
         duration_hours = ctk.CTkEntry(duration_frame, textvariable=self.hours,justify="center",
-                                      font=(style.normal_font, 20), width=(16*3+4),
+                                      font=(style.normal_font, 20), text_color="white", width=(16*3+4),
                                       validate="key", validatecommand=(val_num, "%P"))
         duration_hours.grid(row=0, column=1)
         duration_hours.bind("<KeyRelease>", lambda a:self.convert_dur_entry(a))
@@ -58,7 +59,7 @@ class Add(ctk.CTkFrame):
         hr_label.grid(row=0, column=2, padx=(5,10))
         
         duration_minutes = ctk.CTkEntry(duration_frame, textvariable=self.mins,justify="center",
-                                      font=(style.normal_font, 20), width=(16*2+4),
+                                      font=(style.normal_font, 20), text_color="white", width=(16*2+4),
                                       validate="key", validatecommand=(val_min, "%P"))
         duration_minutes.grid(row=0, column=3)
         duration_minutes.bind("<KeyRelease>", lambda a:self.convert_dur_entry(a))
@@ -69,25 +70,35 @@ class Add(ctk.CTkFrame):
         
         self.duration_slider = ctk.CTkSlider(duration_frame, variable=self.slider_duration, 
                                              from_=0, to=2880, number_of_steps=576, width=300,
-                                             command=lambda minutes: self.convert_slider(minutes))
+                                             button_color=style.main_blue, progress_color=style.main_blue, button_hover_color=style.hover_blue,
+                                             command=lambda minutes: self.convert_dur_slider(minutes))
         self.duration_slider.grid(row=1, column=0, columnspan=5, pady=(6,0))
         
         
 #=====================================================================================================
         # set print weight
+        self.slider_weight = ctk.IntVar()
+        
         weight_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
-        weight_frame.grid(row=1, column=1, sticky="we")
+        weight_frame.grid(row=1, column=1, sticky="we", padx=10, pady=10)
         weight_label = ctk.CTkLabel(weight_frame, text="Weight:", font=(style.normal_font, 20, "bold"), text_color="white")
         weight_label.grid(row=0, column=0, padx=(0,20))
         
-        weight_hours = ctk.CTkEntry(weight_frame, textvariable=self.weight,justify="center",
-                                      font=(style.normal_font, 20), width=(16*4+4),
+        weight_entry = ctk.CTkEntry(weight_frame, textvariable=self.weight,justify="center",
+                                      font=(style.normal_font, 20), text_color="white", width=(16*4+4),
                                       validate="key", validatecommand=(val_num, "%P"))
-        weight_hours.grid(row=0, column=1)
-        weight_hours.bind("<FocusOut>", lambda e: self.default_zero(e,self.weight))
-        weight_hours.bind("<Return>", lambda e: self.default_zero(e,self.weight))
+        weight_entry.grid(row=0, column=1)
+        weight_entry.bind("<KeyRelease>", lambda a:self.convert_weight_entry(a))
+        weight_entry.bind("<FocusOut>", lambda e: self.default_zero(e,self.weight))
+        weight_entry.bind("<Return>", lambda e: self.default_zero(e,self.weight))
         g_label = ctk.CTkLabel(weight_frame, text="g", font=(style.normal_font, 16, "bold"))
         g_label.grid(row=0, column=2, padx=(5,0))
+        
+        self.weight_slider = ctk.CTkSlider(weight_frame, variable=self.slider_weight, 
+                                             from_=0, to=2000, number_of_steps=400, width=180,
+                                             button_color=style.main_blue, progress_color=style.main_blue, button_hover_color=style.hover_blue,
+                                             command=lambda weight: self.convert_weight_slider(weight))
+        self.weight_slider.grid(row=1, column=0, columnspan=5, pady=(6,0))
         
 #=====================================================================================================
         # set printer
@@ -96,13 +107,16 @@ class Add(ctk.CTkFrame):
         self.avail_printers = ["core 1","P1S","H2D"]
         
         printer_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
-        printer_frame.grid(row=2, column=0, sticky="we")
+        printer_frame.grid(row=2, column=0, sticky="we", padx=10, pady=(20,10))
         printer_label = ctk.CTkLabel(printer_frame, text="Select a printer below::", font=(style.normal_font, 20, "bold"), text_color="white")
         printer_label.grid(row=0, column=0)
-        self.printer_dropdown = ctk.CTkComboBox(printer_frame, values=self.avail_printers)
+        self.printer_dropdown = ctk.CTkComboBox(printer_frame, values=self.avail_printers, 
+                                                font=(style.normal_font, 20), text_color="white",
+                                                border_width=3, border_color=style.main_blue,
+                                                button_color=style.main_blue, button_hover_color=style.hover_blue)
         self.printer_dropdown.bind("<KeyRelease>", lambda e: 
             self.on_dropdown_update(self.printer_dropdown,self.printer_list,self.avail_printers))
-        self.printer_dropdown.grid(row=1, column=0)
+        self.printer_dropdown.grid(row=1, column=0, pady=(5,0))
 
 
 #=====================================================================================================
@@ -111,13 +125,16 @@ class Add(ctk.CTkFrame):
         self.avail_filament = self.filament_list
         
         filament_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
-        filament_frame.grid(row=2, column=1, sticky="we")
+        filament_frame.grid(row=2, column=1, sticky="we", padx=10, pady=(20,10))
         filament_label = ctk.CTkLabel(filament_frame, text="Select a filament below::", font=(style.normal_font, 20, "bold"), text_color="white")
         filament_label.grid(row=0, column=0)
-        self.filament_dropdown = ctk.CTkComboBox(filament_frame, values=self.avail_filament)
+        self.filament_dropdown = ctk.CTkComboBox(filament_frame, values=self.avail_filament,
+                                                 font=(style.normal_font, 20), text_color="white",
+                                                 border_width=3, border_color=style.main_blue,
+                                                 button_color=style.main_blue, button_hover_color=style.hover_blue)
         self.filament_dropdown.bind("<KeyRelease>", lambda e: 
             self.on_dropdown_update(self.filament_dropdown,self.filament_list,self.avail_filament))
-        self.filament_dropdown.grid(row=1, column=0)
+        self.filament_dropdown.grid(row=1, column=0, pady=(5,0))
         
 #=====================================================================================================        
         # right side of form
@@ -173,7 +190,11 @@ class Add(ctk.CTkFrame):
         self.duration = self.hours.get()*60 + self.mins.get()
         shutil.copy2(self.gcode_source, r"src\database\gcode")
         
-    def convert_slider(self, minutes):
+        Logs.add_log(user_id=None, print_name=self.print_name, gcode=self.file_name, 
+                     duration=self.duration, weight=self.weight, 
+                     printer_id=None, filament_id=None,)
+        
+    def convert_dur_slider(self, minutes):
         self.hours.set(int(minutes//60))
         self.mins.set(int(minutes%60))
         
@@ -183,6 +204,16 @@ class Add(ctk.CTkFrame):
             self.slider_duration.set(total_duration)
         else:
             self.slider_duration.set(48*60)
+            
+    def convert_weight_slider(self, weight):
+        self.weight.set(int(weight))
+        
+    def convert_weight_entry(self, a):
+        weight = int(self.weight.get())
+        if weight <= 2000:
+            self.weight_slider.set(weight)
+        else:
+            self.weight_slider.set(2000)
         
     def validate_num(self, num):
         return num.isdigit() or num == ""
@@ -195,7 +226,6 @@ class Add(ctk.CTkFrame):
         
     def on_dropdown_update(self, dropdown, master_list, current_list):
         value = dropdown.get()
-        new_list = []
         if current_list != []:
             current_list = []
             for i in master_list:
