@@ -1,4 +1,5 @@
 main_blue = "#00a2ff"
+hover_blue = "#41b7fc"
 
 main_green = "#05ac71"
 
