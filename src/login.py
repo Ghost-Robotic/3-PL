@@ -80,7 +80,8 @@ class Login(ctk.CTkFrame):
         
 
         # submit button
-        self.login_button =ctk.CTkButton(login_cont, command=(lambda : self.submit()), width=100, height=40, text="Login", font=("Segoe UI Black", 25), fg_color="#00a2ff")
+        self.login_button =ctk.CTkButton(login_cont, command=(lambda : self.submit()), width=100, height=40, text="Login", font=("Segoe UI Black", 25)
+                                         , fg_color="#00a2ff", hover_color="#0087d4")
         self.login_button.grid(row=7, column=0, columnspan=2, pady=10)
         
         # help button

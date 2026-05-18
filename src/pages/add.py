@@ -157,13 +157,13 @@ class Add(ctk.CTkFrame):
         file_label.grid(row=1, column=0, sticky="n")
         
         # reset form button
-        reset_button = ctk.CTkButton(r_input_frame, width=88, height=45, fg_color="#FF2020", hover_color="#FA5C5C",
+        reset_button = ctk.CTkButton(r_input_frame, width=88, height=45, fg_color="#FF2020", hover_color="#DA2020",
                                       text="Reset", font=(style.normal_font, 25), text_color="white",
                                       command=(lambda : None))
         reset_button.grid(row=2, column=0, sticky="s", pady=(20,10))
         
         # submit form button
-        submit_button = ctk.CTkButton(r_input_frame, width=150, height=55, fg_color=style.main_green,
+        submit_button = ctk.CTkButton(r_input_frame, width=150, height=55, fg_color=style.main_green, hover_color="#1d966c",
                                       text="Submit", font=(style.bold_font, 30), text_color="white",
                                       command=(lambda : None))
         submit_button.grid(row=3, column=0, sticky="s", pady=(10,40))
