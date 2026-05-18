@@ -6,6 +6,7 @@ from src.database import Logs
 
 class Add(ctk.CTkFrame):
     def __init__(self, parent, controller):
+        self.controller = controller
         self.gcode_source = None
         self.file_name = ctk.StringVar()
         self.print_name = ctk.StringVar()
@@ -190,9 +191,9 @@ class Add(ctk.CTkFrame):
         self.duration = self.hours.get()*60 + self.mins.get()
         shutil.copy2(self.gcode_source, r"src\database\gcode")
         
-        Logs.add_log(user_id=None, print_name=self.print_name, gcode=self.file_name, 
+        Logs.add_log(user_id=self.controller.current_user, print_name=self.print_name, gcode=self.file_name, 
                      duration=self.duration, weight=self.weight, 
-                     printer_id=None, filament_id=None,)
+                     printer_id=None, filament_id=None)
         
     def convert_dur_slider(self, minutes):
         self.hours.set(int(minutes//60))
@@ -233,6 +234,5 @@ class Add(ctk.CTkFrame):
                     current_list.append(i)
         else:
             current_list = master_list
-            
-        
+    
         dropdown.configure(values=current_list)

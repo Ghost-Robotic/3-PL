@@ -67,7 +67,7 @@ class Dashboard(ctk.CTkFrame):
                 
         self.pages = {}      
         for page in (Home, Add, Log, PrintersPage, FilamentPage, AccountPage):
-            frame = page(box, self)
+            frame = page(box, controller)
             self.pages[page] = frame 
             frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)       
             frame.rowconfigure(0, weight=1)
