@@ -107,10 +107,17 @@ class Add(ctk.CTkFrame):
 
 #=====================================================================================================
         # set filament
+        self.filament_list = ["PLA", "PETG", "ABS", "ASA", "TPU-95A","TPU-90A","TPU-85A", "PCCF", "PC", "PEEK", "PLA-CF", "PETG-CF", "PCTG", "ABS-CF", "PPS-CF", "PPA-CF", "PET-CF", "Nylon", "Nylon-GF", "PETG-GF","PC-GF","ABS-GF", "HTPLA","PLA Silk", "Brass filled HTPLA", "Iron filled PLA", "Bronze filled PLA", "Static Dissipative PLA", "Matte PLA", "PLA+", "Matte PETG","PA12CF","PA6CF","Wood PLA", "Marble PLA"]
+        self.avail_filament = self.filament_list
+        
         filament_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
         filament_frame.grid(row=2, column=1, sticky="we")
         filament_label = ctk.CTkLabel(filament_frame, text="Select a filament below::", font=(style.normal_font, 20, "bold"), text_color="white")
         filament_label.grid(row=0, column=0)
+        self.filament_dropdown = ctk.CTkComboBox(filament_frame, values=self.avail_filament)
+        self.filament_dropdown.bind("<KeyRelease>", lambda e: 
+            self.on_dropdown_update(self.filament_dropdown,self.filament_list,self.avail_filament))
+        self.filament_dropdown.grid(row=1, column=0)
         
 #=====================================================================================================        
         # right side of form
