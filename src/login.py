@@ -63,7 +63,7 @@ class Login(ctk.CTkFrame):
         self.username = ctk.CTkEntry(login_cont, width=300, height=25, placeholder_text="ID number", font=(style.normal_font,18,"bold"),
                                      validate="key", validatecommand=(validate_id, "%P"))
         self.username.grid(row=3, column=0, padx=5, pady=(2,10), sticky="w")
-        self.after(700, lambda : self.username.focus())
+        self.after(300, lambda : self.username.focus())
         self.username.bind("<Return>", lambda event : self.submit())
         
         # password entry
