@@ -67,7 +67,7 @@ import sqlite3 as sql
 # database.create_table("people", "f_name")
 # database.add_column('age', 'INTEGER')
 # database.add_column('hello', 'TEXT')
-         
+    
 class Users():
     def __init__(self, database):
         self.connection =sql.connect(database, autocommit=True)
@@ -129,11 +129,11 @@ class Groups():
     def view_table(self):
         """prints entire table
         """
-        for row in self.cursor.execute('SELECT * FROM users'):
+        for row in self.cursor.execute('SELECT * FROM groups'):
             print(row)
             
     def add_group(self, group_name):
-         self.cursor.execute('INSERT INTO logs VALUES (?,?)',(None,group_name))
+         self.cursor.execute('INSERT INTO groups VALUES (?,?)',(None,group_name))
 
 class PrinterModels:
     def __init__(self, database):
@@ -153,11 +153,11 @@ class PrinterModels:
     def view_table(self):
         """prints entire table
         """
-        for row in self.cursor.execute('SELECT * FROM users'):
+        for row in self.cursor.execute('SELECT * FROM printer_models'):
             print(row)
             
     def add_printer_model(self, model_name, brand, multimaterial=False, filament_id=None):
-         self.cursor.execute('INSERT INTO logs VALUES (?,?,?,?,?)',(None,model_name,brand,multimaterial,filament_id))
+         self.cursor.execute('INSERT INTO printer_models VALUES (?,?,?,?,?)',(None,model_name,brand,multimaterial,filament_id))
 
 class Printers:
     def __init__(self, database):
@@ -175,11 +175,11 @@ class Printers:
     def view_table(self):
         """prints entire table
         """
-        for row in self.cursor.execute('SELECT * FROM users'):
+        for row in self.cursor.execute('SELECT * FROM printers'):
             print(row)
             
     def add_printer(self, model_id, group_id=None):
-         self.cursor.execute('INSERT INTO logs VALUES (?,?,?)',(None,model_id,group_id))
+         self.cursor.execute('INSERT INTO printers VALUES (?,?,?)',(None,model_id,group_id))
 
 class Filaments:
     def __init__(self, database):
@@ -198,11 +198,23 @@ class Filaments:
     def view_table(self):
         """prints entire table
         """
-        for row in self.cursor.execute('SELECT * FROM users'):
+        for row in self.cursor.execute('SELECT * FROM filaments'):
             print(row)
             
-    def add_filament(self, material, weight, amount):
-         self.cursor.execute('INSERT INTO logs VALUES (?,?,?,?)', (None,material,weight,amount))
+    def add_filament(self, material, weight=1000, amount=0):
+         self.cursor.execute('INSERT INTO filaments VALUES (?,?,?,?)', (None,material,weight,amount))
+         
+    def fetch_all(self):
+        rows = []
+        for row in self.cursor.execute('SELECT * FROM filaments'):
+            rows.append(row)
+        return rows  
+         
+    def fetch_names(self):
+        materials = []
+        for row in self.cursor.execute('SELECT material FROM filaments ORDER BY material ASC'):
+            materials.append(row[0])
+        return materials
 
 class Logs:
     def __init__(self, database):
@@ -252,3 +264,9 @@ class Logs:
     
     def get_datetime(self):
         pass
+    
+accounts = Users(r"src\database\log.db")
+logs = Logs(r"src\database\log.db")
+printer_models = PrinterModels(r"src\database\log.db")
+printers = Printers(r"src\database\log.db")
+filaments = Filaments(r"src\database\log.db")
