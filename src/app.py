@@ -2,7 +2,7 @@ import customtkinter as ctk
 from os import system, name
 from src.login import Login 
 from src.dashboard import Dashboard
-from src.database import Users
+from src.database import Users, Logs, PrinterModels, Printers, Filaments
 from PIL import Image, ImageTk
 
 
@@ -25,10 +25,10 @@ class App(ctk.CTk):
         self.wm_aspect(16,9,16,9)
         
         # create container that all content will be placed in        
-        container = ctk.CTkFrame(self, bg_color="#2b2b2b")
-        container.grid(row = 0, column = 0, sticky="nsew")
-        container.rowconfigure(0, weight=1)
-        container.columnconfigure(0, weight=1)
+        self.container = ctk.CTkFrame(self, bg_color="#2b2b2b")
+        self.container.grid(row = 0, column = 0, sticky="nsew")
+        self.container.rowconfigure(0, weight=1)
+        self.container.columnconfigure(0, weight=1)
 
         # bg_img = Image.open("assets\\bg.png")
         # self.bg = ctk.CTkImage(dark_image=bg_img, size=(self.winfo_screenwidth(),self.winfo_screenheight()))      
@@ -38,8 +38,8 @@ class App(ctk.CTk):
 
         self.frames = {}
                    
-        for page in (Login, Dashboard):
-            frame = page(container, self)
+        for page in ((Login,)):
+            frame = page(self.container, self)
             self.frames[page] = frame 
             frame.grid(row=0, column=0, sticky="nsew")       
             frame.rowconfigure(0, weight=1)
@@ -54,6 +54,10 @@ class App(ctk.CTk):
     
     def setup_database(self):
         self.accounts = Users(r"src\database\log.db")
+        self.logs = Logs(r"src\database\log.db")
+        self.printer_models = PrinterModels(r"src\database\log.db")
+        self.printers = Printers(r"src\database\log.db")
+        self.filaments = Filaments(r"src\database\log.db")
         
     def display_page(self, frame=None, index=None):
         page = self.frames[frame]
@@ -65,6 +69,12 @@ class App(ctk.CTk):
         
     def login(self):
         if self.access == True and len(self.current_user) == 6:
+            for page in ((Dashboard,)):
+                frame = page(self.container, self)
+                self.frames[page] = frame 
+                frame.grid(row=0, column=0, sticky="nsew")       
+                frame.rowconfigure(0, weight=1)
+                frame.columnconfigure(0, weight=1)
             self.display_page(Dashboard)
         
     def on_resize(self, event):
