@@ -2,7 +2,7 @@ import customtkinter as ctk
 import src.style as style
 import shutil
 from PIL import Image, ImageTk
-from src.database import Logs
+import src.database as db
 
 class Add(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -122,7 +122,7 @@ class Add(ctk.CTkFrame):
 
 #=====================================================================================================
         # set filament
-        self.filament_list = ["PLA", "PETG", "ABS", "ASA", "TPU-95A","TPU-90A","TPU-85A", "PCCF", "PC", "PEEK", "PLA-CF", "PETG-CF", "PCTG", "ABS-CF", "PPS-CF", "PPA-CF", "PET-CF", "Nylon", "Nylon-GF", "PETG-GF","PC-GF","ABS-GF", "HTPLA","PLA Silk", "Brass filled HTPLA", "Iron filled PLA", "Bronze filled PLA", "Static Dissipative PLA", "Matte PLA", "PLA+", "Matte PETG","PA12CF","PA6CF","Wood PLA", "Marble PLA"]
+        self.filament_list = db.filaments.fetch_names()
         self.avail_filament = self.filament_list
         
         filament_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
@@ -191,7 +191,7 @@ class Add(ctk.CTkFrame):
         self.duration = self.hours.get()*60 + self.mins.get()
         shutil.copy2(self.gcode_source, r"src\database\gcode")
         
-        Logs.add_log(user_id=self.controller.current_user, print_name=self.print_name, gcode=self.file_name, 
+        db.logs.add_log(user_id=self.controller.current_user, print_name=self.print_name, gcode=self.file_name, 
                      duration=self.duration, weight=self.weight, 
                      printer_id=None, filament_id=None)
         
