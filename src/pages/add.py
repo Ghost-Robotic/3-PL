@@ -38,8 +38,8 @@ class Add(ctk.CTkFrame):
         
 # =================================================================================================       
         # set print duration
-        self.hours = ctk.IntVar()
-        self.mins = ctk.IntVar()
+        self.hours = ctk.StringVar(value="0")
+        self.mins = ctk.StringVar(value="0")
         self.slider_duration = ctk.IntVar()
         val_num = self.register(self.validate_num)
         val_min = self.register(self.validate_min)
@@ -79,19 +79,20 @@ class Add(ctk.CTkFrame):
 #=====================================================================================================
         # set print weight
         self.slider_weight = ctk.IntVar()
+        self.entry_weight = ctk.StringVar(value="0")
         
         weight_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
         weight_frame.grid(row=1, column=1, sticky="we", padx=10, pady=10)
         weight_label = ctk.CTkLabel(weight_frame, text="Weight:", font=(style.normal_font, 20, "bold"), text_color="white")
         weight_label.grid(row=0, column=0, padx=(0,20))
         
-        weight_entry = ctk.CTkEntry(weight_frame, textvariable=self.weight,justify="center",
+        weight_entry = ctk.CTkEntry(weight_frame, textvariable=self.entry_weight,justify="center",
                                       font=(style.normal_font, 20), text_color="white", width=(16*4+4),
                                       validate="key", validatecommand=(val_num, "%P"))
         weight_entry.grid(row=0, column=1)
         weight_entry.bind("<KeyRelease>", lambda a:self.convert_weight_entry(a))
-        weight_entry.bind("<FocusOut>", lambda e: self.default_zero(e,self.weight))
-        weight_entry.bind("<Return>", lambda e: self.default_zero(e,self.weight))
+        weight_entry.bind("<FocusOut>", lambda e: self.default_zero(e,self.entry_weight))
+        weight_entry.bind("<Return>", lambda e: self.default_zero(e,self.entry_weight))
         g_label = ctk.CTkLabel(weight_frame, text="g", font=(style.normal_font, 16, "bold"))
         g_label.grid(row=0, column=2, padx=(5,0))
         
@@ -104,17 +105,18 @@ class Add(ctk.CTkFrame):
 #=====================================================================================================
         # set printer
         self.printers = ctk.StringVar()
-        self.printer_list = ["core 1","P1S","H2D"] #command get printer list from database
-        self.avail_printers = ["core 1","P1S","H2D"]
+        self.printer_list = db.printer_models.fetch_name_brand()
+        self.avail_printers = self.printer_list
         
         printer_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
         printer_frame.grid(row=2, column=0, sticky="we", padx=10, pady=(20,10))
         printer_label = ctk.CTkLabel(printer_frame, text="Select a printer below::", font=(style.normal_font, 20, "bold"), text_color="white")
         printer_label.grid(row=0, column=0)
-        self.printer_dropdown = ctk.CTkComboBox(printer_frame, values=self.avail_printers, 
+        self.printer_dropdown = ctk.CTkComboBox(printer_frame, values=self.avail_printers, width=240,
                                                 font=(style.normal_font, 20), text_color="white",
                                                 border_width=3, border_color=style.main_blue,
-                                                button_color=style.main_blue, button_hover_color=style.hover_blue)
+                                                button_color=style.main_blue, button_hover_color=style.hover_blue,
+                                                command=(lambda e:self.filament_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)))
         self.printer_dropdown.bind("<KeyRelease>", lambda e: 
             self.on_dropdown_update(self.printer_dropdown,self.printer_list,self.avail_printers))
         self.printer_dropdown.grid(row=1, column=0, pady=(5,0))
@@ -129,10 +131,11 @@ class Add(ctk.CTkFrame):
         filament_frame.grid(row=2, column=1, sticky="we", padx=10, pady=(20,10))
         filament_label = ctk.CTkLabel(filament_frame, text="Select a filament below::", font=(style.normal_font, 20, "bold"), text_color="white")
         filament_label.grid(row=0, column=0)
-        self.filament_dropdown = ctk.CTkComboBox(filament_frame, values=self.avail_filament,
+        self.filament_dropdown = ctk.CTkComboBox(filament_frame, values=self.avail_filament, width=240,
                                                  font=(style.normal_font, 20), text_color="white",
                                                  border_width=3, border_color=style.main_blue,
-                                                 button_color=style.main_blue, button_hover_color=style.hover_blue)
+                                                 button_color=style.main_blue, button_hover_color=style.hover_blue,
+                                                 command=(lambda e:self.filament_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)))
         self.filament_dropdown.bind("<KeyRelease>", lambda e: 
             self.on_dropdown_update(self.filament_dropdown,self.filament_list,self.avail_filament))
         self.filament_dropdown.grid(row=1, column=0, pady=(5,0))
@@ -163,9 +166,9 @@ class Add(ctk.CTkFrame):
         reset_button.grid(row=2, column=0, sticky="s", pady=(20,10))
         
         # submit form button
-        submit_button = ctk.CTkButton(r_input_frame, width=150, height=55, fg_color=style.main_green, hover_color="#1d966c",
+        submit_button = ctk.CTkButton(r_input_frame, width=140, height=55, fg_color=style.main_green, hover_color="#1d966c",
                                       text="Submit", font=(style.bold_font, 30), text_color="white",
-                                      command=(lambda : None))
+                                      command=(lambda : self.submit_form()))
         submit_button.grid(row=3, column=0, sticky="s", pady=(10,40))
         
 #=================================================================================================================================
@@ -195,26 +198,31 @@ class Add(ctk.CTkFrame):
                      duration=self.duration, weight=self.weight, 
                      printer_id=None, filament_id=None)
         
+    def reset_form(self):
+        pass
+        
     def convert_dur_slider(self, minutes):
-        self.hours.set(int(minutes//60))
-        self.mins.set(int(minutes%60))
+        self.hours.set(str(int(minutes//60)))
+        self.mins.set(str(int(minutes%60)))
         
     def convert_dur_entry(self,a):
-        total_duration = self.hours.get()*60 + self.mins.get()
-        if total_duration <= (48*60):
-            self.slider_duration.set(total_duration)
-        else:
-            self.slider_duration.set(48*60)
+        if self.hours.get() != "" and self.mins.get()!="":
+            total_duration = int(self.hours.get())*60 + int(self.mins.get())
+            if total_duration <= (48*60):
+                self.slider_duration.set(total_duration)
+            else:
+                self.slider_duration.set(48*60)
             
     def convert_weight_slider(self, weight):
-        self.weight.set(int(weight))
+        self.entry_weight.set(int(weight))
         
     def convert_weight_entry(self, a):
-        weight = int(self.weight.get())
-        if weight <= 2000:
-            self.weight_slider.set(weight)
-        else:
-            self.weight_slider.set(2000)
+        if self.entry_weight.get() != "":
+            weight = int(self.entry_weight.get())
+            if weight <= 2000:
+                self.weight_slider.set(weight)
+            else:
+                self.weight_slider.set(2000)
         
     def validate_num(self, num):
         return num.isdigit() or num == ""
@@ -223,11 +231,16 @@ class Add(ctk.CTkFrame):
         return (minutes.isdigit() and int(minutes)<60) or minutes == ""
     
     def default_zero(self, event, var):
-        var.set(0)
+        if var.get() == "":
+            var.set(0)
         
     def on_dropdown_update(self, dropdown, master_list, current_list):
         value = dropdown.get()
         if current_list != []:
+            if dropdown.get() not in master_list:
+                dropdown.configure(border_color="red", button_color="red")
+            else:
+                dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
             current_list = []
             for i in master_list:
                 if value.lower() in i.lower():
