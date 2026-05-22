@@ -4,6 +4,7 @@ import src.database as db
 
 class FilamentPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
+        self.controller = controller
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
         container.grid(row=0, column=0, sticky='nsew', padx=25, pady=(5,25))
@@ -16,7 +17,11 @@ class FilamentPage(ctk.CTkFrame):
         topbar.grid(row=0,column=0, sticky='we')
         topbar.columnconfigure(0, weight=1)
         
-        option_button = ctk.CTkSegmentedButton(topbar, width=200, values=[" View "," Add "], 
+        if self.controller.auth_level == 5:
+            options = [" View "," Add "]
+        else:
+            options = [" View "]
+        option_button = ctk.CTkSegmentedButton(topbar, width=200, values=options, 
                                                font=(style.normal_font, 22), text_color="white",
                                                selected_color=style.main_blue, selected_hover_color=style.hover_blue,
                                                border_width=0, corner_radius=10,
@@ -42,8 +47,9 @@ class FilamentPage(ctk.CTkFrame):
         self.view_box.grid_remove()
         filaments = db.filaments.fetch_all()
         
-        header_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground, height=45)
-        header_frame.grid(row=0, column=0, sticky="swe", padx=20)
+        header_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground, height=37,
+                                              scrollbar_button_color=style.dark_foreground, scrollbar_button_hover_color=style.dark_foreground)
+        header_frame.grid(row=0, column=0, sticky="swe", padx=20,pady=0)
         header_frame._scrollbar.configure(height=45)
         table_header = ["ID", "Name", "Spool Weight", "No."]
         for i in range(len(table_header)):
@@ -56,7 +62,7 @@ class FilamentPage(ctk.CTkFrame):
             label.grid(row=0,column=0) 
         
         table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
-        table_frame.grid(row=1, column=0, sticky="nsew", padx=20)
+        table_frame.grid(row=1, column=0, sticky="nsew", padx=20,pady=0)
         for i in range(4):
             table_frame.columnconfigure(i, weight=1, uniform=0) 
         row_counter = 0
@@ -77,7 +83,61 @@ class FilamentPage(ctk.CTkFrame):
         #initialise add subpage
         self.add_box = ctk.CTkFrame(content_box,fg_color=style.dark_foreground)
         self.add_box.grid(row=0, column=0, sticky="nsew")
+        self.add_box.columnconfigure(0, weight=1)
         self.add_box.grid_remove()
+        self.material_name = ctk.StringVar()
+        self.weight = ctk.StringVar(value="0")
+        self.amount = ctk.StringVar(value="0")
+        val_num = self.register(self.validate_num)
+        
+        form_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
+        form_frame.grid(row=0,column=0)
+        name_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
+        name_frame.grid(row=0,column=0, padx=40, pady=(30,12),sticky="nw")
+        name_frame.columnconfigure(1, weight=1)
+        name_label = ctk.CTkLabel(name_frame, text="Material Name:", font=(style.normal_font, 25, "bold"), text_color="white")
+        name_label.grid(row=0, column=0, padx=(0,20))
+        self.name_entry = ctk.CTkEntry(name_frame, textvariable=self.material_name,
+                                   font=(style.normal_font, 25), text_color="#f5f5f5", width=300)
+        self.name_entry.grid(row=0, column=1)
+        
+        weight_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
+        weight_frame.grid(row=1,column=0, padx=(60,0), pady=15, sticky="nw")
+        weight_frame.columnconfigure(1, weight=1)
+        weight_label = ctk.CTkLabel(weight_frame, text="Spool Weight:", font=(style.normal_font, 20, "bold"), text_color="white")
+        weight_label.grid(row=0, column=0, padx=(0,20))
+        self.weight_entry = ctk.CTkEntry(weight_frame, textvariable=self.weight,
+                                   font=(style.normal_font, 20), text_color="#f5f5f5", width=80,
+                                   validate="key", validatecommand=(val_num, "%P"))
+        self.weight_entry.grid(row=0, column=1)
+        self.weight_entry.bind("<FocusOut>", lambda e: self.default_zero(self.weight))
+        self.weight_entry.bind("<Return>", lambda e: self.default_zero(self.weight))
+        
+        amount_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
+        amount_frame.grid(row=2,column=0, padx=(60,0), pady=15, sticky="nw")
+        amount_frame.columnconfigure(1, weight=1)
+        amount_label = ctk.CTkLabel(amount_frame, text="No. available spools:", font=(style.normal_font, 20, "bold"), text_color="white")
+        amount_label.grid(row=0, column=0, padx=(0,20))
+        self.amount_entry = ctk.CTkEntry(amount_frame, textvariable=self.amount,
+                                   font=(style.normal_font, 20), text_color="#f5f5f5", width=60,
+                                   validate="key", validatecommand=(val_num, "%P"))
+        self.amount_entry.grid(row=0, column=1)
+        self.amount_entry.bind("<FocusOut>", lambda e: self.default_zero(self.amount))
+        self.amount_entry.bind("<Return>", lambda e: self.default_zero(self.amount))
+        
+        buttons_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
+        buttons_frame.grid(row=1,column=0)
+        # reset form button
+        reset_button = ctk.CTkButton(buttons_frame, width=70, height=30, fg_color="#FF2020", hover_color="#DA2020",
+                                      text="Reset", font=(style.normal_font, 22), text_color="white",
+                                      command=(lambda : None))
+        reset_button.grid(row=0, column=0, padx=10)
+        
+        # submit form button
+        submit_button = ctk.CTkButton(buttons_frame, width=100, height=35, fg_color=style.main_green, hover_color="#1d966c",
+                                      text="Submit", font=(style.normal_font, 25, "bold"), text_color="white",
+                                      command=(lambda : None))
+        submit_button.grid(row=0, column=1, padx=10)
         
         self.grid_view()
 #=================================================================================
@@ -105,3 +165,10 @@ class FilamentPage(ctk.CTkFrame):
     # hide subpage to add filaments    
     def remove_add(self):
         self.add_box.grid_remove()
+        
+    def validate_num(self, num):
+        return num.isdigit() or num == ""
+    
+    def default_zero(self, var):
+        if var.get() == "":
+            var.set(0)
