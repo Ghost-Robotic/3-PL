@@ -112,6 +112,16 @@ class Users():
             return password, salt
         else:
             raise Exception("User not found")
+        
+    def fetch_auth(self, user_id):
+        results = self.cursor.execute('''SELECT access_level 
+                                      FROM users
+                                      WHERE user_id = ?''',(user_id,))
+        row = results.fetchone()
+        if row:
+            return int(row[0])
+        else:
+            raise Exception("User not found")
 
         
 class Groups():
@@ -158,6 +168,19 @@ class PrinterModels:
             
     def add_printer_model(self, model_name, brand, multimaterial=False, filament_id=None):
          self.cursor.execute('INSERT INTO printer_models VALUES (?,?,?,?,?)',(None,model_name,brand,multimaterial,filament_id))
+         
+    def fetch_all(self):
+        rows = []
+        for row in self.cursor.execute('SELECT * FROM printer_models'):
+            rows.append(row)
+        return rows  
+         
+    def fetch_name_brand(self):
+        materials = []
+        for row in self.cursor.execute('SELECT model_name, brand FROM printer_models ORDER BY brand ASC'):
+            name = row[1] +" "+ row[0]
+            materials.append(name)
+        return materials
 
 class Printers:
     def __init__(self, database):
@@ -180,6 +203,8 @@ class Printers:
             
     def add_printer(self, model_id, group_id=None):
          self.cursor.execute('INSERT INTO printers VALUES (?,?,?)',(None,model_id,group_id))
+         
+
 
 class Filaments:
     def __init__(self, database):
