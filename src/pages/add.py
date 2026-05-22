@@ -104,7 +104,6 @@ class Add(ctk.CTkFrame):
         
 #=====================================================================================================
         # set printer
-        self.printers = ctk.StringVar()
         self.printer_list = db.printer_models.fetch_name_brand()
         self.avail_printers = self.printer_list
         
@@ -112,14 +111,15 @@ class Add(ctk.CTkFrame):
         printer_frame.grid(row=2, column=0, sticky="we", padx=10, pady=(20,10))
         printer_label = ctk.CTkLabel(printer_frame, text="Select a printer below::", font=(style.normal_font, 20, "bold"), text_color="white")
         printer_label.grid(row=0, column=0)
-        self.printer_dropdown = ctk.CTkComboBox(printer_frame, values=self.avail_printers, width=240,
-                                                font=(style.normal_font, 20), text_color="white",
-                                                border_width=3, border_color=style.main_blue,
-                                                button_color=style.main_blue, button_hover_color=style.hover_blue,
-                                                command=(lambda e:self.filament_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)))
+        self.printer_dropdown = ctk.CTkComboBox(printer_frame, values=self.avail_printers,
+                                            width=240,font=(style.normal_font, 20), text_color="white",
+                                            border_width=3, border_color=style.main_blue,
+                                            button_color=style.main_blue, button_hover_color=style.hover_blue,
+                                            command=(lambda e:self.printer_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)))
         self.printer_dropdown.bind("<KeyRelease>", lambda e: 
             self.on_dropdown_update(self.printer_dropdown,self.printer_list,self.avail_printers))
         self.printer_dropdown.grid(row=1, column=0, pady=(5,0))
+        self.printer_dropdown.set("")
 
 
 #=====================================================================================================
@@ -131,14 +131,15 @@ class Add(ctk.CTkFrame):
         filament_frame.grid(row=2, column=1, sticky="we", padx=10, pady=(20,10))
         filament_label = ctk.CTkLabel(filament_frame, text="Select a filament below::", font=(style.normal_font, 20, "bold"), text_color="white")
         filament_label.grid(row=0, column=0)
-        self.filament_dropdown = ctk.CTkComboBox(filament_frame, values=self.avail_filament, width=240,
-                                                 font=(style.normal_font, 20), text_color="white",
+        self.filament_dropdown = ctk.CTkComboBox(filament_frame, values=self.avail_filament,
+                                                 width=240,font=(style.normal_font, 20), text_color="white",
                                                  border_width=3, border_color=style.main_blue,
                                                  button_color=style.main_blue, button_hover_color=style.hover_blue,
                                                  command=(lambda e:self.filament_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)))
         self.filament_dropdown.bind("<KeyRelease>", lambda e: 
             self.on_dropdown_update(self.filament_dropdown,self.filament_list,self.avail_filament))
         self.filament_dropdown.grid(row=1, column=0, pady=(5,0))
+        self.filament_dropdown.set("")
         
 #=====================================================================================================        
         # right side of form
@@ -149,8 +150,8 @@ class Add(ctk.CTkFrame):
         r_input_frame.rowconfigure(1, weight=1)
         
         # upload file button
-        plus = ImageTk.PhotoImage((Image.open("assets\plus.png")).resize((100,100), Image.LANCZOS))
-        self.add_file_button = ctk.CTkButton(r_input_frame, width=200, image=plus, height=200, anchor='center', corner_radius=18, text="",
+        self.plus = ImageTk.PhotoImage((Image.open("assets\plus.png")).resize((100,100), Image.LANCZOS))
+        self.add_file_button = ctk.CTkButton(r_input_frame, width=200, image=self.plus, height=200, anchor='center', corner_radius=18, text="",
                                     fg_color="#272727", border_color="white", border_width=3, hover_color=style.dark_foreground,
                                     command=(lambda : self.upload_file()))
         self.add_file_button.grid(row=0, column=0, padx=10,sticky="s")
@@ -162,7 +163,7 @@ class Add(ctk.CTkFrame):
         # reset form button
         reset_button = ctk.CTkButton(r_input_frame, width=88, height=45, fg_color="#FF2020", hover_color="#DA2020",
                                       text="Reset", font=(style.normal_font, 25), text_color="white",
-                                      command=(lambda : None))
+                                      command=(lambda : self.reset_form()))
         reset_button.grid(row=2, column=0, sticky="s", pady=(20,10))
         
         # submit form button
@@ -199,11 +200,28 @@ class Add(ctk.CTkFrame):
                      printer_id=None, filament_id=None)
         
     def reset_form(self):
-        pass
+        strings = [self.print_name,self.printer_dropdown,self.filament_dropdown]
+        integers = [self.hours,self.mins,self.slider_duration,self.entry_weight,self.slider_weight]
+        
+        for string in strings:
+            string.set("")
+            
+        for integer in integers:
+            integer.set(0)
+        
+        self.printer_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
+        self.filament_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
+        
+        self.avail_printers = self.printer_list
+        self.avail_filament = self.filament_list
+        
+        self.file_name.set("*.gcode")
+        self.add_file_button.configure(image=self.plus,border_color="white")
         
     def convert_dur_slider(self, minutes):
         self.hours.set(str(int(minutes//60)))
         self.mins.set(str(int(minutes%60)))
+        self.gcode_source = None
         
     def convert_dur_entry(self,a):
         if self.hours.get() != "" and self.mins.get()!="":
