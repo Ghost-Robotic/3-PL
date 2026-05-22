@@ -3,6 +3,7 @@ from os import system, name
 from src.login import Login 
 from src.dashboard import Dashboard
 from src.database import Users, Logs, PrinterModels, Printers, Filaments
+import src.database as db
 from PIL import Image, ImageTk
 
 
@@ -10,6 +11,7 @@ class App(ctk.CTk):
     def __init__(self, *args, **kwargs):
         self.access = False
         self.current_user = None
+        self.auth_level = None
         ctk.CTk.__init__(self, *args, **kwargs)
         #self.bind("<Configure>", self.on_resize)
         # configure window
@@ -69,6 +71,7 @@ class App(ctk.CTk):
         
     def login(self):
         if self.access == True and len(self.current_user) == 6:
+            self.auth_level = db.accounts.fetch_auth(self.current_user)
             for page in ((Dashboard,)):
                 frame = page(self.container, self)
                 self.frames[page] = frame 
