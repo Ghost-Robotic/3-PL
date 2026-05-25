@@ -24,7 +24,6 @@ class App(ctk.CTk):
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)
         self.minsize(576, 324)
-        self.wm_aspect(16,9,16,9)
         
         # create container that all content will be placed in        
         self.container = ctk.CTkFrame(self, bg_color="#2b2b2b")
@@ -52,7 +51,6 @@ class App(ctk.CTk):
         #self.display_page(Dashboard)
         self.display_page(list(self.frames)[0])
            
-        self.setup_database()
     
     def setup_database(self):
         self.accounts = Users(r"src\database\log.db")
@@ -66,6 +64,7 @@ class App(ctk.CTk):
         page.tkraise()                        
         
     def start(self): 
+        self.setup_database()
         self.after(1, lambda : self.state('zoomed'))
         self.mainloop()
         
@@ -79,6 +78,12 @@ class App(ctk.CTk):
                 frame.rowconfigure(0, weight=1)
                 frame.columnconfigure(0, weight=1)
             self.display_page(Dashboard)
+            
+    def logout(self):
+        self.access = False
+        self.current_user = None
+        self.auth_level = None
+        self.frames[Dashboard].destroy()
         
     def on_resize(self, event):
         #pass

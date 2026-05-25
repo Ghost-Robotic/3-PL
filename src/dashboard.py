@@ -11,12 +11,17 @@ from src.pages.filament import FilamentPage
 
 class Dashboard(ctk.CTkFrame):
     def __init__(self, parent, controller):
+        self.controller = controller
         ctk.CTkFrame.__init__(self, parent, fg_color="#2b2b2b")
+        
+        logout_button = ctk.CTkButton(self, command=(lambda : self.logout()), width=100, height=40, text="Logout", font=("Segoe UI Black", 25),
+                                      fg_color="#00a2ff", hover_color="#0087d4")
+        logout_button.pack(side="top",anchor='e',padx=3,pady=3)
         
         # navigation bar
         nav_container= ctk.CTkFrame(self, fg_color=style.dark_background, corner_radius=30, bg_color=style.dark_background)
         # nav_container.grid(row=0, column=0, padx=0, pady=(0,0))
-        nav_container.pack(side="top", pady=(30,0))
+        nav_container.pack(side="top", pady=(0,0))
         
         #===========================================
         logo = ImageTk.PhotoImage((Image.open("assets\\3-PL-700x400.png")).resize((140,80), Image.LANCZOS))
@@ -80,6 +85,9 @@ class Dashboard(ctk.CTkFrame):
     def display_page(self, frame):
         page = self.pages[frame]
         page.tkraise()
+        
+    def logout(self):
+        self.controller.logout()
         
     def set_page(self, page):
         match page:
