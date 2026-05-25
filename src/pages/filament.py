@@ -51,9 +51,10 @@ class FilamentPage(ctk.CTkFrame):
                                               scrollbar_button_color=style.dark_foreground, scrollbar_button_hover_color=style.dark_foreground)
         header_frame.grid(row=0, column=0, sticky="swe", padx=20,pady=0)
         header_frame._scrollbar.configure(height=45)
-        table_header = ["ID", "Name", "Spool Weight", "No."]
+        table_header = ["ID", "Name", "Spool Weight (g)", "No."]
+        weights = [1,3,3,2]
         for i in range(len(table_header)):
-            header_frame.columnconfigure(i, weight=1, uniform=0)
+            header_frame.columnconfigure(i, weight=weights[i], uniform=0)
             frame = ctk.CTkFrame(header_frame, border_width=3, border_color=style.main_blue, corner_radius=8)
             frame.grid(row=0,column=i, ipadx=7, ipady=8, sticky="nsew",padx=0)
             frame.rowconfigure(0, weight=1)
@@ -63,8 +64,10 @@ class FilamentPage(ctk.CTkFrame):
         
         table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
         table_frame.grid(row=1, column=0, sticky="nsew", padx=20,pady=0)
-        for i in range(4):
-            table_frame.columnconfigure(i, weight=1, uniform=0) 
+        row_counter = 0
+        for i in (1,3,3,2):
+            table_frame.columnconfigure(row_counter, weight=i, uniform=0) 
+            row_counter += 1
         row_counter = 0
         for row in filaments:
             column_counter = 0
@@ -172,3 +175,9 @@ class FilamentPage(ctk.CTkFrame):
     def default_zero(self, var):
         if var.get() == "":
             var.set(0)
+            
+    def submit_form(self):
+        pass
+    
+    def reset_form(self):
+        pass
