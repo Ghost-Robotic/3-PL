@@ -144,6 +144,7 @@ class Login(ctk.CTkFrame):
                     self.controller.login()
                     #self.controller.display_page(list(self.controller.frames)[1])
                     print("match")
+                    self.username.focus()
                     self.clear_username()
                     self.clear_password()
                     self.hide_error()
