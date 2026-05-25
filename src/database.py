@@ -176,11 +176,20 @@ class PrinterModels:
         return rows  
          
     def fetch_name_brand(self):
-        materials = []
-        for row in self.cursor.execute('SELECT model_name, brand FROM printer_models ORDER BY brand ASC'):
-            name = row[1] +" "+ row[0]
-            materials.append(name)
-        return materials
+        models = {}
+        for row in self.cursor.execute('SELECT model_id, model_name, brand FROM printer_models ORDER BY brand ASC'):
+            id = row[0]
+            name = row[2] +" "+ row[1]
+            models.update({name:id})
+        return models
+    
+    def fetch_id(self, name):
+        row = self.cursor.execute('SELECT model_id FROM printer_models where model_name = ?',(name,))
+        model = self.cursor.fetchone()
+        if model[0] != None:
+            return model[0]
+        else:
+            raise Exception("Model not found")
 
 class Printers:
     def __init__(self, database):
@@ -236,9 +245,9 @@ class Filaments:
         return rows  
          
     def fetch_names(self):
-        materials = []
-        for row in self.cursor.execute('SELECT material FROM filaments ORDER BY material ASC'):
-            materials.append(row[0])
+        materials = {}
+        for row in self.cursor.execute('SELECT filament_id,material FROM filaments ORDER BY material ASC'):
+            materials.update({row[1]:row[0]})
         return materials
 
 class Logs:
@@ -265,11 +274,11 @@ class Logs:
             FOREIGN KEY (user_id)
                 REFERENCES users (user_id),
                 
-            FOREIGN KEY (printer_id)
-                REFERENCES users (printer_id),
+            FOREIGN KEY (model_id)
+                REFERENCES printer_models (model_id),
                 
             FOREIGN KEY (filament_id)
-                REFERENCES users (filament_id),
+                REFERENCES filaments (filament_id),
                 
             FOREIGN KEY (approver_id)
                 REFERENCES users (user_id)
@@ -281,14 +290,15 @@ class Logs:
         for row in self.cursor.execute('SELECT * FROM users'):
             print(row)
             
-    def add_log(self, user_id, print_name, gcode, duration, weight, printer_id=None, filament_id=None, approval=None, approver_id=None, successful=None):
-        self.cursor.execute('SELECT datetime("now","localtime")')
-        datetime = self.cursor.fetchone()
+    def add_log(self, user_id, print_name, gcode, duration, weight, printer_id, filament_id, approval=None, approver_id=None, successful=None):
+        datetime = self.get_datetime()
         
         self.cursor.execute('INSERT INTO logs VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',(None,user_id,print_name,gcode,duration,weight,datetime,printer_id,filament_id,approval,approver_id,successful))
     
     def get_datetime(self):
-        pass
+        self.cursor.execute('SELECT datetime("now","localtime")')
+        datetime = self.cursor.fetchone()
+        return datetime[0]
     
 accounts = Users(r"src\database\log.db")
 logs = Logs(r"src\database\log.db")
