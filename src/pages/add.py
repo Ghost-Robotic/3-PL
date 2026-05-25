@@ -104,7 +104,8 @@ class Add(ctk.CTkFrame):
         
 #=====================================================================================================
         # set printer
-        self.printer_list = db.printer_models.fetch_name_brand()
+        self.print_dict = db.printer_models.fetch_name_brand()
+        self.printer_list = list(self.print_dict.keys())
         self.avail_printers = self.printer_list
         
         printer_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
@@ -124,7 +125,8 @@ class Add(ctk.CTkFrame):
 
 #=====================================================================================================
         # set filament
-        self.filament_list = db.filaments.fetch_names()
+        self.filament_dict = db.filaments.fetch_names()
+        self.filament_list = list(self.filament_dict.keys())
         self.avail_filament = self.filament_list
         
         filament_frame = ctk.CTkFrame(l_input_frame, fg_color=style.dark_foreground)
@@ -189,15 +191,41 @@ class Add(ctk.CTkFrame):
             self.file_name.set(name)
             if self.print_title.get() == "":
                 self.print_name.set(name[0:-6])
+                
+    def validate(self):
+        try:
+            check = [self.print_name.get()!="",
+                     self.file_name.get()!="",
+                     (int(self.hours.get())*60 + int(self.mins.get())) !=0,
+                     int(self.entry_weight.get())!=0,
+                     self.printer_dropdown.get() in self.printer_list,
+                     self.filament_dropdown.get() in self.filament_list]
+            if all(check):
+                return True
+        except:
+            return False
             
         
     def submit_form(self):
-        self.duration = self.hours.get()*60 + self.mins.get()
-        shutil.copy2(self.gcode_source, r"src\database\gcode")
+        if self.validate():
+            try:
+                self.duration = int(self.hours.get())*60 + int(self.mins.get())
+                self.weight = int(self.entry_weight.get())
+                printer_id = self.print_dict.get(self.printer_dropdown.get())
+                filament_id = self.filament_dict.get(self.filament_dropdown.get())
+                db.logs.add_log(user_id=self.controller.current_user, print_name=self.print_name.get(), gcode=self.file_name.get(), 
+                            duration=self.duration, weight=self.weight, 
+                            printer_id=printer_id, filament_id=filament_id)
+                
+                shutil.copy2(str(self.gcode_source), r"src\database\gcode")
+                self.reset_form()
+            except:
+                raise Exception("Unable to save")
+                
+            
+        else:
+            print("Invalid Input")
         
-        db.logs.add_log(user_id=self.controller.current_user, print_name=self.print_name, gcode=self.file_name, 
-                     duration=self.duration, weight=self.weight, 
-                     printer_id=None, filament_id=None)
         
     def reset_form(self):
         strings = [self.print_name,self.printer_dropdown,self.filament_dropdown]
@@ -217,11 +245,11 @@ class Add(ctk.CTkFrame):
         
         self.file_name.set("*.gcode")
         self.add_file_button.configure(image=self.plus,border_color="white")
+        self.gcode_source = None
         
     def convert_dur_slider(self, minutes):
         self.hours.set(str(int(minutes//60)))
         self.mins.set(str(int(minutes%60)))
-        self.gcode_source = None
         
     def convert_dur_entry(self,a):
         if self.hours.get() != "" and self.mins.get()!="":
