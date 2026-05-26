@@ -5,6 +5,7 @@ from src.dashboard import Dashboard
 from src.database import Users, Logs, PrinterModels, Printers, Filaments
 import src.database as db
 from PIL import Image, ImageTk
+import style 
 
 
 class App(ctk.CTk):
@@ -26,7 +27,7 @@ class App(ctk.CTk):
         self.minsize(576, 324)
         
         # create container that all content will be placed in        
-        self.container = ctk.CTkFrame(self, bg_color="#2b2b2b")
+        self.container = ctk.CTkFrame(self, bg_color=style.dark_background)
         self.container.grid(row = 0, column = 0, sticky="nsew")
         self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)

@@ -12,7 +12,7 @@ from src.pages.filament import FilamentPage
 class Dashboard(ctk.CTkFrame):
     def __init__(self, parent, controller):
         self.controller = controller
-        ctk.CTkFrame.__init__(self, parent, fg_color="#2b2b2b")
+        ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background)
         
         logout_button = ctk.CTkButton(self, command=(lambda : self.logout()), width=100, height=40, text="Logout", font=("Segoe UI Black", 25),
                                       fg_color="#00a2ff", hover_color="#0087d4")
@@ -62,7 +62,7 @@ class Dashboard(ctk.CTkFrame):
         self.account_button.pack(side='left', fill="y", expand=True)
         
         # page
-        page_container = ctk.CTkFrame(self)
+        page_container = ctk.CTkFrame(self, fg_color=style.dark_background)
         page_container.pack(side="top", fill="both", expand=True)
         
         box = ctk.CTkFrame(page_container, corner_radius=30, fg_color=style.dark_foreground)
