@@ -14,7 +14,7 @@ class FilamentPage(ctk.CTkFrame):
 
         
         topbar = ctk.CTkFrame(container, fg_color=style.dark_foreground)
-        topbar.grid(row=0,column=0, sticky='we')
+        topbar.grid(row=0,column=0, sticky='nwe')
         topbar.columnconfigure(0, weight=1)
         
         if self.controller.auth_level == 5:
@@ -87,6 +87,8 @@ class FilamentPage(ctk.CTkFrame):
         self.add_box = ctk.CTkFrame(content_box,fg_color=style.dark_foreground)
         self.add_box.grid(row=0, column=0, sticky="nsew")
         self.add_box.columnconfigure(0, weight=1)
+        self.add_box.rowconfigure(0, weight=1)
+        self.add_box.rowconfigure(1, weight=1)
         self.add_box.grid_remove()
         self.material_name = ctk.StringVar()
         self.weight = ctk.StringVar(value="0")
@@ -94,7 +96,7 @@ class FilamentPage(ctk.CTkFrame):
         val_num = self.register(self.validate_num)
         
         form_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
-        form_frame.grid(row=0,column=0)
+        form_frame.grid(row=0,column=0, sticky="n")
         name_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
         name_frame.grid(row=0,column=0, padx=40, pady=(30,12),sticky="nw")
         name_frame.columnconfigure(1, weight=1)
@@ -129,11 +131,11 @@ class FilamentPage(ctk.CTkFrame):
         self.amount_entry.bind("<Return>", lambda e: self.default_zero(self.amount))
         
         buttons_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
-        buttons_frame.grid(row=1,column=0)
+        buttons_frame.grid(row=1,column=0, sticky="s", pady=10)
         # reset form button
         reset_button = ctk.CTkButton(buttons_frame, width=70, height=30, fg_color="#FF2020", hover_color="#DA2020",
                                       text="Reset", font=(style.normal_font, 22), text_color="white",
-                                      command=(lambda : None))
+                                      command=(lambda : self.reset_form()))
         reset_button.grid(row=0, column=0, padx=10)
         
         # submit form button
@@ -180,4 +182,6 @@ class FilamentPage(ctk.CTkFrame):
         pass
     
     def reset_form(self):
-        pass
+        self.material_name.set("")
+        self.weight.set(0)
+        self.amount.set(0)

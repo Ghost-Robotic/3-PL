@@ -15,7 +15,7 @@ class PrintersPage(ctk.CTkFrame):
 
         
         topbar = ctk.CTkFrame(container, fg_color=style.dark_foreground)
-        topbar.grid(row=0,column=0, sticky='we')
+        topbar.grid(row=0,column=0, sticky='nwe')
         topbar.columnconfigure(0, weight=1)
         
         if self.controller.auth_level == 5:
@@ -51,7 +51,7 @@ class PrintersPage(ctk.CTkFrame):
         header_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground, height=37,
                                               scrollbar_button_color=style.dark_foreground, scrollbar_button_hover_color=style.dark_foreground)
         header_frame.grid(row=0, column=0, sticky="swe", padx=20,pady=0)
-        header_frame._scrollbar.configure(height=40)
+        header_frame._scrollbar.configure(height=45)
         table_header = ["ID", "Model Name", "Brand", "Multi-Material", "Compatible Filament"]
         weights = [2,5,5,3,4]
         for i in range(len(table_header)):
@@ -93,53 +93,48 @@ class PrintersPage(ctk.CTkFrame):
         self.add_box = ctk.CTkFrame(content_box,fg_color=style.dark_foreground)
         self.add_box.grid(row=0, column=0, sticky="nsew")
         self.add_box.columnconfigure(0, weight=1)
+        self.add_box.rowconfigure(0, weight=1)
+        self.add_box.rowconfigure(1, weight=1)
         self.add_box.grid_remove()
-        self.material_name = ctk.StringVar()
-        self.weight = ctk.StringVar(value="0")
-        self.amount = ctk.StringVar(value="0")
+        self.brand = ctk.StringVar()
+        self.model_name = ctk.StringVar()
+        self.multi_material = ctk.BooleanVar()
         val_num = self.register(self.validate_num)
         
         form_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
-        form_frame.grid(row=0,column=0)
+        form_frame.grid(row=0,column=0, sticky="n")
+        
+        brand_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
+        brand_frame.grid(row=0,column=0, padx=20, pady=(30,12),sticky="nw")
+        brand_frame.columnconfigure(1, weight=1)
+        brand_label = ctk.CTkLabel(brand_frame, text="Brand:", font=(style.normal_font, 22, "bold"), text_color="white")
+        brand_label.grid(row=0, column=0, padx=(0,20))
+        self.brand_entry = ctk.CTkEntry(brand_frame, textvariable=self.brand,
+                                   font=(style.normal_font, 22), text_color="#f5f5f5", width=300)
+        self.brand_entry.grid(row=0, column=1)
+        
         name_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
-        name_frame.grid(row=0,column=0, padx=40, pady=(30,12),sticky="nw")
+        name_frame.grid(row=0,column=1, padx=20, pady=(30,12),sticky="nw")
         name_frame.columnconfigure(1, weight=1)
-        name_label = ctk.CTkLabel(name_frame, text="Material Name:", font=(style.normal_font, 25, "bold"), text_color="white")
+        name_label = ctk.CTkLabel(name_frame, text="Model:", font=(style.normal_font, 22, "bold"), text_color="white")
         name_label.grid(row=0, column=0, padx=(0,20))
-        self.name_entry = ctk.CTkEntry(name_frame, textvariable=self.material_name,
-                                   font=(style.normal_font, 25), text_color="#f5f5f5", width=300)
+        self.name_entry = ctk.CTkEntry(name_frame, textvariable=self.model_name,
+                                   font=(style.normal_font, 22), text_color="#f5f5f5", width=300)
         self.name_entry.grid(row=0, column=1)
         
-        weight_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
-        weight_frame.grid(row=1,column=0, padx=(60,0), pady=15, sticky="nw")
-        weight_frame.columnconfigure(1, weight=1)
-        weight_label = ctk.CTkLabel(weight_frame, text="Spool Weight:", font=(style.normal_font, 20, "bold"), text_color="white")
-        weight_label.grid(row=0, column=0, padx=(0,20))
-        self.weight_entry = ctk.CTkEntry(weight_frame, textvariable=self.weight,
-                                   font=(style.normal_font, 20), text_color="#f5f5f5", width=80,
-                                   validate="key", validatecommand=(val_num, "%P"))
-        self.weight_entry.grid(row=0, column=1)
-        self.weight_entry.bind("<FocusOut>", lambda e: self.default_zero(self.weight))
-        self.weight_entry.bind("<Return>", lambda e: self.default_zero(self.weight))
-        
-        amount_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
-        amount_frame.grid(row=2,column=0, padx=(60,0), pady=15, sticky="nw")
-        amount_frame.columnconfigure(1, weight=1)
-        amount_label = ctk.CTkLabel(amount_frame, text="No. available spools:", font=(style.normal_font, 20, "bold"), text_color="white")
-        amount_label.grid(row=0, column=0, padx=(0,20))
-        self.amount_entry = ctk.CTkEntry(amount_frame, textvariable=self.amount,
-                                   font=(style.normal_font, 20), text_color="#f5f5f5", width=60,
-                                   validate="key", validatecommand=(val_num, "%P"))
-        self.amount_entry.grid(row=0, column=1)
-        self.amount_entry.bind("<FocusOut>", lambda e: self.default_zero(self.amount))
-        self.amount_entry.bind("<Return>", lambda e: self.default_zero(self.amount))
+        mm_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
+        mm_frame.grid(row=1,column=0, padx=40, pady=(30,12),sticky="nw")
+        mm_label = ctk.CTkLabel(mm_frame, text="Multi-Material Capable:", font=(style.normal_font, 20, "bold"), text_color="white")
+        mm_label.grid(row=0, column=0, padx=(30,20))
+        mm_check = ctk.CTkCheckBox(mm_frame, variable=self.multi_material, text="", width=0, fg_color=style.main_blue, hover_color=style.hover_blue)
+        mm_check.grid(row=0,column=1)
         
         buttons_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
-        buttons_frame.grid(row=1,column=0)
+        buttons_frame.grid(row=1,column=0, sticky="s", pady=10)
         # reset form button
         reset_button = ctk.CTkButton(buttons_frame, width=70, height=30, fg_color="#FF2020", hover_color="#DA2020",
                                       text="Reset", font=(style.normal_font, 22), text_color="white",
-                                      command=(lambda : None))
+                                      command=(lambda : self.reset_form()))
         reset_button.grid(row=0, column=0, padx=10)
         
         # submit form button
@@ -159,19 +154,19 @@ class PrintersPage(ctk.CTkFrame):
                 self.remove_view()
                 self.grid_add()
     
-    # display subpage to view filaments        
+    # display subpage to view printers        
     def grid_view(self):
         self.view_box.grid()
     
-    # hide subpage to view filaments
+    # hide subpage to view printers
     def remove_view(self):
         self.view_box.grid_remove()
     
-    # display subpage to add filaments
+    # display subpage to add printers
     def grid_add(self):
         self.add_box.grid()
         
-    # hide subpage to add filaments    
+    # hide subpage to add printers    
     def remove_add(self):
         self.add_box.grid_remove()
         
@@ -184,3 +179,8 @@ class PrintersPage(ctk.CTkFrame):
             
     def submit_form(self):
         pass
+    
+    def reset_form(self):
+        self.brand.set("")
+        self.model_name.set("")
+        self.multi_material.set(False)
