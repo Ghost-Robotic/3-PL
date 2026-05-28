@@ -122,6 +122,15 @@ class Users():
             return int(row[0])
         else:
             raise Exception("User not found")
+        
+    def fetch_name(self, user_id):
+        result = self.cursor.execute('''SELECT f_name, l_name 
+                                     FROM users 
+                                     WHERE user_id =?''',(user_id,))
+        
+        row = result.fetchone()
+        name = row[0] + " " + row[1]
+        return name
 
         
 class Groups():
@@ -184,12 +193,18 @@ class PrinterModels:
         return models
     
     def fetch_id(self, name):
-        row = self.cursor.execute('SELECT model_id FROM printer_models where model_name = ?',(name,))
+        row = self.cursor.execute('SELECT model_id FROM printer_models WHERE model_name = ?',(name,))
         model = self.cursor.fetchone()
         if model[0] != None:
             return model[0]
         else:
             raise Exception("Model not found")
+        
+    def fetch_name(self, id):
+        row = self.cursor.execute('SELECT brand, model_name FROM printer_models WHERE model_id = ?',(id,))
+        result = row.fetchone()
+        name = result[0] +" "+ result[1]
+        return name
 
 class Printers:
     def __init__(self, database):
@@ -249,6 +264,12 @@ class Filaments:
         for row in self.cursor.execute('SELECT filament_id,material FROM filaments ORDER BY material ASC'):
             materials.update({row[1]:row[0]})
         return materials
+    
+    def fetch_name(self, id):
+        row = self.cursor.execute('SELECT material FROM filaments WHERE filament_id = ?',(id,))
+        result = row.fetchone()
+        name = result[0]
+        return name
 
 class Logs:
     def __init__(self, database):
@@ -299,6 +320,33 @@ class Logs:
         self.cursor.execute('SELECT datetime("now","localtime")')
         datetime = self.cursor.fetchone()
         return datetime[0]
+    
+    def fetch_table(self):
+        rows = []
+        for row in self.cursor.execute('SELECT print_id, user_id, print_name, duration, weight, printer_id, filament_id, date_time FROM logs'):
+            columns = []
+            columns.append(str(row[0]))
+            
+            name = accounts.fetch_name(row[1])
+            columns.append(name)
+            
+            columns.append(row[2])
+
+            hours = row[3]//60
+            mins = row[3]%60
+            columns.append(str(hours)+"hrs "+str(mins)+"mins")
+
+            columns.append(row[4])
+            
+            columns.append(printer_models.fetch_name(row[5]))
+            columns.append(filaments.fetch_name(row[6]))
+            
+            datetime = row[7].split()
+            columns.append(datetime[1])
+            columns.append(datetime[0])
+            rows.append(columns)
+        return rows 
+        
     
 accounts = Users(r"src\database\log.db")
 logs = Logs(r"src\database\log.db")
