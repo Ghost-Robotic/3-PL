@@ -65,8 +65,8 @@ class App(ctk.CTk):
         page.tkraise()                        
         
     def start(self): 
-        self.setup_database()
         self.after(1, lambda : self.state('zoomed'))
+        self.setup_database()
         self.mainloop()
         
     def login(self):

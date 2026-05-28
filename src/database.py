@@ -129,8 +129,20 @@ class Users():
                                      WHERE user_id =?''',(user_id,))
         
         row = result.fetchone()
-        name = row[0] + " " + row[1]
-        return name
+        name = row[0][0].upper()+row[0][1:]+ " " + row[1][0].upper()+row[1][1:]
+        return name.title()
+    
+    def fetch_table(self):
+        rows = []
+        for row in self.cursor.execute('SELECT user_id, access_level, f_name, l_name FROM users'):
+            columns = []
+            name = row[2][0].upper()+row[2][1:]+ " " + row[3][0].upper()+row[3][1:]
+            
+            columns.append(row[0])
+            columns.append(name)
+            columns.append(row[1])
+            rows.append(columns)
+        return rows 
 
         
 class Groups():
@@ -205,6 +217,7 @@ class PrinterModels:
         result = row.fetchone()
         name = result[0] +" "+ result[1]
         return name
+    
 
 class Printers:
     def __init__(self, database):
@@ -344,6 +357,7 @@ class Logs:
             datetime = row[7].split()
             columns.append(datetime[1])
             columns.append(datetime[0])
+            
             rows.append(columns)
         return rows 
         
