@@ -12,3 +12,8 @@ TKinter interface to allow people to log 3D print jobs and associated details, a
 **id**: 654321  
 **password**: password  
 **access_level**: 1  
+
+**Name**: Thomas Smith  
+**id**: 987654  
+**password**: 123456  
+**access_level**: 4  
