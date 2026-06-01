@@ -91,8 +91,11 @@ class Users():
         for row in self.cursor.execute('SELECT * FROM users'):
             print(row)
         
-    def create_user(self, user_id, f_name, l_name, password=None, salt=None, access_level=1, group_id=None):
+    def create_user(self, user_id, f_name, l_name, password, salt, access_level=1, group_id=None):
         self.cursor.execute('INSERT INTO users VALUES (?,?,?,?,?,?,?)', (user_id, password, salt, f_name, l_name, access_level, group_id))
+        
+    def change_password(self, id, password, salt):
+        self.cursor.execute('UPDATE users SET password=?. salt=? WHERE user_id=?', (password,salt,id))
         
     def fetch_password(self, user_id):
         """fetch hashed password and salt
@@ -143,7 +146,12 @@ class Users():
             columns.append(row[1])
             rows.append(columns)
         return rows 
-
+    
+    def fetch_all_id(self):
+        id = []
+        for row in self.cursor.execute('SELECT user_id FROM users'):
+            id.append(row[0])
+        return id
         
 class Groups():
     def __init__(self, database):
@@ -195,6 +203,12 @@ class PrinterModels:
         for row in self.cursor.execute('SELECT * FROM printer_models'):
             rows.append(row)
         return rows  
+    
+    def fetch_all_names(self):
+        rows = []
+        for row in self.cursor.execute('SELECT model_name FROM printer_models'):
+            rows.append(row[0].lower())
+        return rows     
          
     def fetch_name_brand(self):
         models = {}
