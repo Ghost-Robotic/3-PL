@@ -170,7 +170,7 @@ class Add(ctk.CTkFrame):
         
         # submit form button
         submit_button = ctk.CTkButton(r_input_frame, width=140, height=55, fg_color=style.main_green, hover_color="#1d966c",
-                                      text="Submit", font=(style.bold_font, 30), text_color="white",
+                                      text="Save", font=(style.bold_font, 30), text_color="white",
                                       command=(lambda : self.submit_form()))
         submit_button.grid(row=3, column=0, sticky="s", pady=(10,40))
         
@@ -196,6 +196,7 @@ class Add(ctk.CTkFrame):
         try:
             check = [self.print_name.get()!="",
                      self.file_name.get()!="",
+                     self.file_name.get()!="*.gcode",
                      (int(self.hours.get())*60 + int(self.mins.get())) !=0,
                      int(self.entry_weight.get())!=0,
                      self.printer_dropdown.get() in self.printer_list,
@@ -220,14 +221,13 @@ class Add(ctk.CTkFrame):
                 shutil.copy2(str(self.gcode_source), r"src\database\gcode")
                 self.reset_form()
             except:
-                raise Exception("Unable to save")
-                
-            
+                self.show_error()            
         else:
-            print("Invalid Input")
+            self.show_error()
         
         
     def reset_form(self):
+        self.show_error()
         strings = [self.print_name,self.printer_dropdown,self.filament_dropdown]
         integers = [self.hours,self.mins,self.slider_duration,self.entry_weight,self.slider_weight]
         
@@ -246,6 +246,8 @@ class Add(ctk.CTkFrame):
         self.file_name.set("*.gcode")
         self.add_file_button.configure(image=self.plus,border_color="white")
         self.gcode_source = None
+        
+        self.hide_error()
         
     def convert_dur_slider(self, minutes):
         self.hours.set(str(int(minutes//60)))
@@ -295,3 +297,51 @@ class Add(ctk.CTkFrame):
             current_list = master_list
     
         dropdown.configure(values=current_list)
+        
+    def show_error(self):
+        self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
+        self.error_cont.grid(row=0, column=0)
+        self.error_cont.rowconfigure(0,weight=1)
+        self.error_cont.rowconfigure(1,weight=5)
+        self.error_cont.columnconfigure(0,weight=1)
+        
+        topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
+        topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
+        error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
+        error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
+        
+        close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
+                                     hover_color="red", fg_color="#242323",width=30,height=30,
+                                     command=(lambda : self.hide_error()))
+        close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
+        
+        error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
+        error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
+        error_frame.columnconfigure(0,weight=1)
+        
+        check = [self.print_name.get()!="",
+            (int(self.hours.get())*60 + int(self.mins.get())) !=0,
+            int(self.entry_weight.get())!=0,
+            self.printer_dropdown.get() in self.printer_list,
+            self.filament_dropdown.get() in self.filament_list]
+        
+        if not all(check):
+            error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))   
+        elif self.file_name.get()=="*.gcode":
+            error = ctk.CTkLabel(error_frame, text="no gcode file", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))   
+        else:
+            error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))
+        
+        okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
+                                     border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
+                                     command=(lambda : self.hide_error()))
+        okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
+        
+    def hide_error(self):
+        try:
+            self.error_cont.destroy()
+        except:
+            pass

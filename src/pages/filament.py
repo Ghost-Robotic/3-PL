@@ -146,8 +146,8 @@ class FilamentPage(ctk.CTkFrame):
         
         # submit form button
         submit_button = ctk.CTkButton(buttons_frame, width=100, height=35, fg_color=style.main_green, hover_color="#1d966c",
-                                      text="Submit", font=(style.normal_font, 25, "bold"), text_color="white",
-                                      command=(lambda : None))
+                                      text="Save", font=(style.normal_font, 25, "bold"), text_color="white",
+                                      command=(lambda : self.submit_form()))
         submit_button.grid(row=0, column=1, padx=10)
         
         self.grid_view()
@@ -185,9 +185,79 @@ class FilamentPage(ctk.CTkFrame):
             var.set(0)
             
     def submit_form(self):
-        pass
+        materials = list(db.filaments.fetch_names().keys())
+        
+        check = [self.material_name.get().strip()!="",
+                 self.weight.get().strip()!=0,
+                 self.weight.get().strip()!=""]
+        
+        exist = False
+        for material in materials:
+            if material.lower() == self.material_name.get().strip().lower():
+                exist = True
+        
+        try:
+            if not exist and all(check):
+                db.filaments.add_filament(material=self.material_name, weight=self.weight, amount=self.amount)
+                self.reset_form()
+            else:
+                self.show_error()
+        except:
+            self.show_error()
     
     def reset_form(self):
         self.material_name.set("")
         self.weight.set(0)
         self.amount.set(0)
+        self.hide_error()
+        
+    def show_error(self):
+        self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
+        self.error_cont.grid(row=0, column=0)
+        self.error_cont.rowconfigure(0,weight=1)
+        self.error_cont.rowconfigure(1,weight=5)
+        self.error_cont.columnconfigure(0,weight=1)
+        
+        topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
+        topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
+        error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
+        error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
+        
+        close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
+                                     hover_color="red", fg_color="#242323",width=30,height=30,
+                                     command=(lambda : self.hide_error()))
+        close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
+        
+        error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
+        error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
+        error_frame.columnconfigure(0,weight=1)
+        
+        check = [self.material_name.get().strip()!="",
+                 self.weight.get().strip()!=0,
+                 self.weight.get().strip()!=""]
+        materials = list(db.filaments.fetch_names().keys())
+        exist = False
+        for material in materials:
+            if material.lower() == self.material_name.get().strip().lower():
+                exist = True
+        
+        if not all(check):
+            error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))   
+        elif exist:
+            error = ctk.CTkLabel(error_frame, text="material already exists", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))   
+        else:
+            error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))
+        
+        okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
+                                     border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
+                                     command=(lambda : self.hide_error()))
+        okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
+        
+    def hide_error(self):
+        try:
+            self.error_cont.destroy()
+        except:
+            pass
