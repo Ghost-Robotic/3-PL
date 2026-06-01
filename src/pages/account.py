@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import src.style as style
 import src.database as db
+import src.helpers.hash_utils as hsh
 class AccountPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         self.controller = controller
@@ -51,12 +52,12 @@ class AccountPage(ctk.CTkFrame):
         
         name = (db.accounts.fetch_name(self.controller.current_user)).split()
         
-        id = ctk.StringVar(value=self.controller.current_user)
-        fname = ctk.StringVar(value=name[0])
-        lname = ctk.StringVar(value=name[1])
-        auth_level = ctk.StringVar(value=self.controller.auth_level)
+        current_id = ctk.StringVar(value=self.controller.current_user)
+        current_fname = ctk.StringVar(value=name[0])
+        current_lname = ctk.StringVar(value=name[1])
+        current_auth_level = ctk.StringVar(value=self.controller.auth_level)
         
-        self.password = ctk.StringVar()
+        self.current_password = ctk.StringVar()
         self.new_pass = ctk.StringVar()
         self.new_pass2 = ctk.StringVar()
         
@@ -67,30 +68,32 @@ class AccountPage(ctk.CTkFrame):
         id_frame.grid(row=1, column=0, sticky="w", padx=10, pady=10)
         id_label = ctk.CTkLabel(id_frame, text="Your ID:", font=(style.normal_font, 25, "bold"), text_color="white")
         id_label.grid(row=0, column=0, padx=(0,20))
-        id_entry = ctk.CTkEntry(id_frame, textvariable=id, width=88,
-                                   font=(style.normal_font, 22), text_color="#f5f5f5", state="disabled")
+        id_entry = ctk.CTkLabel(id_frame, textvariable=current_id, width=100,
+                                   font=(style.normal_font, 22, "bold"), text_color="yellow", state="disabled")
         id_entry.grid(row=0, column=1)
         
         username_frame = ctk.CTkFrame(self.profile_box,fg_color=style.dark_foreground)
         username_frame.grid(row=2, column=0, sticky="w", padx=10, pady=10)
         fname_label = ctk.CTkLabel(username_frame, text="First Name:", font=(style.normal_font, 25, "bold"), text_color="white")
         fname_label.grid(row=0, column=0, padx=(0,20))
-        fname_entry = ctk.CTkEntry(username_frame, textvariable=fname, width=300,
-                                   font=(style.normal_font, 22), text_color="#f5f5f5", state="disabled")
+        fname_entry = ctk.CTkEntry(username_frame, textvariable=current_fname, width=300,
+                                   font=(style.normal_font, 22, "bold"), text_color="#f5f5f5", state="disabled")
         fname_entry.grid(row=0, column=1)
         lname_label = ctk.CTkLabel(username_frame, text="Last Name:", font=(style.normal_font, 25, "bold"), text_color="white")
         lname_label.grid(row=0, column=2, padx=(40,20))
-        lname_entry = ctk.CTkEntry(username_frame, textvariable=lname, width=300,
-                                   font=(style.normal_font, 22), text_color="#f5f5f5", state="disabled")
+        lname_entry = ctk.CTkEntry(username_frame, textvariable=current_lname, width=300,
+                                   font=(style.normal_font, 22, "bold"), text_color="#f5f5f5", state="disabled")
         lname_entry.grid(row=0, column=3)
         
         auth_frame = ctk.CTkFrame(self.profile_box,fg_color=style.dark_foreground)
         auth_frame.grid(row=3, column=0, sticky="w", padx=10, pady=10)
         auth_label = ctk.CTkLabel(auth_frame, text="Authentication Level:", font=(style.normal_font, 25, "bold"), text_color="white")
         auth_label.grid(row=0, column=0, padx=(0,20))
-        auth_entry = ctk.CTkEntry(auth_frame, textvariable=auth_level, width=26,
-                                   font=(style.normal_font, 22), text_color="#f5f5f5", state="disabled")
-        auth_entry.grid(row=0, column=1)
+        auth_num = ctk.CTkLabel(auth_frame, textvariable=current_auth_level,font=(style.normal_font, 22, "bold"), text_color="yellow")
+        auth_num.grid(row=0,column=1)
+        # auth_entry = ctk.CTkEntry(auth_frame, textvariable=auth_level, width=26,
+        #                            font=(style.normal_font, 22), text_color="#f5f5f5", state="disabled")
+        # auth_entry.grid(row=0, column=1)
         
         # change password widget
         change_pass_frame = ctk.CTkFrame(self.profile_box,fg_color=style.dark_foreground)
@@ -102,7 +105,7 @@ class AccountPage(ctk.CTkFrame):
         entry_widget.grid(row=1,column=0)
         pass_label = ctk.CTkLabel(entry_widget, text="Current Password:", font=(style.normal_font, 25, "bold"), text_color="white")
         pass_label.grid(row=0, column=0, padx=(10,20), pady=10, sticky="e")
-        pass_entry = ctk.CTkEntry(entry_widget, textvariable=self.password, width=300, show="•",
+        pass_entry = ctk.CTkEntry(entry_widget, textvariable=self.current_password, width=300, show="•",
                                    font=(style.normal_font, 22), text_color="#f5f5f5", border_color=style.main_blue)
         pass_entry.grid(row=0, column=1)
         
@@ -185,54 +188,88 @@ class AccountPage(ctk.CTkFrame):
         
 #=================================================================================
         #initialise add subpage
-        self.add_box = ctk.CTkFrame(content_box,fg_color=style.dark_foreground)
+        self.add_box = ctk.CTkScrollableFrame(content_box,fg_color=style.dark_foreground)
         self.add_box.grid(row=0, column=0, sticky="nsew")
         self.add_box.columnconfigure(0, weight=1)
         self.add_box.rowconfigure(0, weight=1)
         self.add_box.rowconfigure(1, weight=1)
         self.add_box.grid_remove()
-        self.material_name = ctk.StringVar()
-        self.weight = ctk.StringVar(value="0")
-        self.amount = ctk.StringVar(value="0")
-        val_num = self.register(self.validate_num)
+
+        val_id = self.register(self.validate_id)
+        val_auth = self.register(self.validate_auth)
         
         form_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
         form_frame.grid(row=0,column=0, sticky="n")
-        name_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
-        name_frame.grid(row=0,column=0, padx=40, pady=(30,12),sticky="nw")
-        name_frame.columnconfigure(1, weight=1)
-        name_label = ctk.CTkLabel(name_frame, text="Material Name:", font=(style.normal_font, 25, "bold"), text_color="white")
-        name_label.grid(row=0, column=0, padx=(0,20))
-        self.name_entry = ctk.CTkEntry(name_frame, textvariable=self.material_name,
-                                   font=(style.normal_font, 25), text_color="#f5f5f5", width=300)
-        self.name_entry.grid(row=0, column=1)
         
-        weight_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
-        weight_frame.grid(row=1,column=0, padx=(60,0), pady=15, sticky="nw")
-        weight_frame.columnconfigure(1, weight=1)
-        weight_label = ctk.CTkLabel(weight_frame, text="Spool Weight:", font=(style.normal_font, 20, "bold"), text_color="white")
-        weight_label.grid(row=0, column=0, padx=(0,20))
-        self.weight_entry = ctk.CTkEntry(weight_frame, textvariable=self.weight,
-                                   font=(style.normal_font, 20), text_color="#f5f5f5", width=80,
-                                   validate="key", validatecommand=(val_num, "%P"))
-        self.weight_entry.grid(row=0, column=1)
-        self.weight_entry.bind("<FocusOut>", lambda e: self.default_zero(self.weight))
-        self.weight_entry.bind("<Return>", lambda e: self.default_zero(self.weight))
+        self.id = ctk.StringVar()
+        self.fname = ctk.StringVar()
+        self.lname = ctk.StringVar()
+        self.auth_level = ctk.IntVar(value=1)        
+        self.password = ctk.StringVar()
+        self.confirm_password = ctk.StringVar()
+
+        profile_title = ctk.CTkLabel(form_frame, text="User Details:", font=(style.bold_font, 30), text_color=style.main_blue)
+        profile_title.grid(row=0, column=0, pady=20, sticky="w")
         
-        amount_frame = ctk.CTkFrame(form_frame, fg_color=style.dark_foreground)
-        amount_frame.grid(row=2,column=0, padx=(60,0), pady=15, sticky="nw")
-        amount_frame.columnconfigure(1, weight=1)
-        amount_label = ctk.CTkLabel(amount_frame, text="No. available spools:", font=(style.normal_font, 20, "bold"), text_color="white")
-        amount_label.grid(row=0, column=0, padx=(0,20))
-        self.amount_entry = ctk.CTkEntry(amount_frame, textvariable=self.amount,
-                                   font=(style.normal_font, 20), text_color="#f5f5f5", width=60,
-                                   validate="key", validatecommand=(val_num, "%P"))
-        self.amount_entry.grid(row=0, column=1)
-        self.amount_entry.bind("<FocusOut>", lambda e: self.default_zero(self.amount))
-        self.amount_entry.bind("<Return>", lambda e: self.default_zero(self.amount))
+        id_frame = ctk.CTkFrame(form_frame,fg_color=style.dark_foreground)
+        id_frame.grid(row=1, column=0, sticky="w", padx=20, pady=10)
+        id_label = ctk.CTkLabel(id_frame, text="Your ID:", font=(style.normal_font, 25, "bold"), text_color="white")
+        id_label.grid(row=0, column=0, padx=(0,20))
+        id_entry = ctk.CTkEntry(id_frame, textvariable=self.id, width=100,
+                                   font=(style.normal_font, 22, "bold"), text_color="yellow", validate="key", validatecommand=(val_id, "%P"))
+        id_entry.grid(row=0, column=1)
+        
+        username_frame = ctk.CTkFrame(form_frame,fg_color=style.dark_foreground)
+        username_frame.grid(row=2, column=0, sticky="w", padx=20, pady=10)
+        fname_label = ctk.CTkLabel(username_frame, text="First Name:", font=(style.normal_font, 25, "bold"), text_color="white")
+        fname_label.grid(row=0, column=0, padx=(0,20))
+        fname_entry = ctk.CTkEntry(username_frame, textvariable=self.fname, width=300,
+                                   font=(style.normal_font, 22, "bold"), text_color="#f5f5f5")
+        fname_entry.grid(row=0, column=1)
+        lname_label = ctk.CTkLabel(username_frame, text="Last Name:", font=(style.normal_font, 25, "bold"), text_color="white")
+        lname_label.grid(row=0, column=2, padx=(40,20))
+        lname_entry = ctk.CTkEntry(username_frame, textvariable=self.lname, width=300,
+                                   font=(style.normal_font, 22, "bold"), text_color="#f5f5f5")
+        lname_entry.grid(row=0, column=3)
+        
+        auth_frame = ctk.CTkFrame(form_frame,fg_color=style.dark_foreground)
+        auth_frame.grid(row=3, column=0, sticky="w", padx=20, pady=10)
+        auth_label = ctk.CTkLabel(auth_frame, text="Authentication Level:", font=(style.normal_font, 25, "bold"), text_color="white")
+        auth_label.grid(row=0, column=0, padx=(0,20))
+        # auth_entry = ctk.CTkEntry(auth_frame, textvariable=self.auth_level, width=30,
+        #                            font=(style.normal_font, 22), text_color="#f5f5f5",validate="key", validatecommand=(val_auth, "%P"))
+        # auth_entry.grid(row=0, column=1)
+        self.auth_options = ctk.CTkOptionMenu(auth_frame, variable=self.auth_level, values=["1","2","3","4","5"],
+                                         corner_radius=10, button_color=style.main_blue, button_hover_color=style.hover_blue,
+                                         fg_color=style.main_blue, font=(style.normal_font, 22, "bold"), width=80,
+                                         dropdown_font=(style.normal_font, 18))
+        self.auth_options.grid(row=0,column=1)
+        
+        change_pass_frame = ctk.CTkFrame(form_frame,fg_color=style.dark_foreground)
+        change_pass_frame.grid(row=4, column=0, sticky="w", pady=(30,0))
+        pass_title = ctk.CTkLabel(change_pass_frame, text="Password:", font=(style.bold_font, 27), text_color=style.main_blue)
+        pass_title.grid(row=0, column=0, padx=(10,20), pady=10, sticky="w")
+        
+        entry_widget = ctk.CTkFrame(change_pass_frame,fg_color=style.dark_foreground)
+        entry_widget.grid(row=1,column=0, padx=20)
+
+        add_pass_label = ctk.CTkLabel(entry_widget, text="Password:", font=(style.normal_font, 25, "bold"), text_color="white")
+        add_pass_label.grid(row=0, column=0, padx=(10,20), pady=(20,10), sticky="e")
+        self.add_pass_entry = ctk.CTkEntry(entry_widget, textvariable=self.password, width=300, show="•",
+                                   font=(style.normal_font, 22), text_color="#f5f5f5", border_color=style.main_blue)
+        self.add_pass_entry.bind("<KeyRelease>", lambda e: self.compare_pass())
+        self.add_pass_entry.grid(row=0, column=1)
+        
+        c_add_pass_label = ctk.CTkLabel(entry_widget, text="Confirm Password:", font=(style.normal_font, 25, "bold"), text_color="white")
+        c_add_pass_label.grid(row=1, column=0, padx=(10,20), sticky="e")
+        self.c_add_pass_entry = ctk.CTkEntry(entry_widget, textvariable=self.confirm_password, width=300, show="•",
+                                   font=(style.normal_font, 22), text_color="#f5f5f5", border_color=style.main_blue)
+        self.c_add_pass_entry.bind("<KeyRelease>", lambda e: self.compare_pass())
+        self.c_add_pass_entry.grid(row=1, column=1)
+        
         
         buttons_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
-        buttons_frame.grid(row=1,column=0, sticky="s", pady=10)
+        buttons_frame.grid(row=1,column=0, sticky="s", pady=(30, 10))
         # reset form button
         reset_button = ctk.CTkButton(buttons_frame, width=70, height=30, fg_color="#FF2020", hover_color="#DA2020",
                                       text="Reset", font=(style.normal_font, 22), text_color="white",
@@ -241,8 +278,8 @@ class AccountPage(ctk.CTkFrame):
         
         # submit form button
         submit_button = ctk.CTkButton(buttons_frame, width=100, height=35, fg_color=style.main_green, hover_color="#1d966c",
-                                      text="Submit", font=(style.normal_font, 25, "bold"), text_color="white",
-                                      command=(lambda : None))
+                                      text="Save", font=(style.normal_font, 25, "bold"), text_color="white",
+                                      command=(lambda : self.submit_form()))
         submit_button.grid(row=0, column=1, padx=10)
         
         self.grid_profile()
@@ -287,7 +324,14 @@ class AccountPage(ctk.CTkFrame):
     def remove_add(self):
         self.add_box.grid_remove()
         
-    def validate_num(self, num):
+    def validate_id(self, num):
+        if len(str(num)) > 6:
+            return False
+        return num.isdigit() or num == ""
+    
+    def validate_auth(self, num):
+        if 0 < len(str(num)) < 6:
+            return False
         return num.isdigit() or num == ""
     
     def default_zero(self, var):
@@ -295,20 +339,43 @@ class AccountPage(ctk.CTkFrame):
             var.set(0)
             
     def submit_form(self):
-        pass
+        ids = db.accounts.fetch_all_id()
+        check = [len(self.id.get())==6,
+                 self.fname.get()!="",
+                 self.lname.get()!="",
+                 self.password.get()==self.confirm_password.get(),
+                 self.id.get() not in ids]
+        
+        try:
+            if all(check):
+                salt = hsh.generate_salt()
+                db.accounts.create_user(id=self.id, f_name=self.fname,l_name=self.lname,access_level=self.auth_level, 
+                                        password=(hsh.hash(self.password.get(),salt)), salt=salt)
+            else:
+                self.show_error()
+        except:
+            self.show_error()
+        
+        
     
     def reset_form(self):
-        self.material_name.set("")
-        self.weight.set(0)
-        self.amount.set(0)
+        for object in [self.id, self.fname,self.lname,self.password,self.confirm_password]:
+            object.set("")
+        self.auth_level.set(1)
+        self.auth_options.set("1")
+        self.add_pass_entry.configure(border_color=style.main_blue)
+        self.c_add_pass_entry.configure(border_color=style.main_blue)
+        self.hide_error()
         
-    def save_pass(self):
+    def save_new_pass(self):
         pass
     
     def reset_pass(self):
-        self.password.set("")
+        self.current_password.set("")
         self.new_pass.set("")
         self.new_pass2.set("")
+        self.new_pass_entry.configure(border_color=style.main_blue)
+        self.new2_pass_entry.configure(border_color=style.main_blue)
         
     def compare_new_pass(self):
         if self.new_pass.get() == self.new_pass2.get():
@@ -317,3 +384,63 @@ class AccountPage(ctk.CTkFrame):
         else:
             self.new_pass_entry.configure(border_color="red")
             self.new2_pass_entry.configure(border_color="red")
+            
+    def compare_pass(self):
+        if self.password.get() == self.confirm_password.get():
+            self.add_pass_entry.configure(border_color=style.main_blue)
+            self.c_add_pass_entry.configure(border_color=style.main_blue)
+        else:
+            self.add_pass_entry.configure(border_color="red")
+            self.c_add_pass_entry.configure(border_color="red")
+            
+    def show_error(self):
+        self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
+        self.error_cont.grid(row=0, column=0)
+        self.error_cont.rowconfigure(0,weight=1)
+        self.error_cont.rowconfigure(1,weight=5)
+        self.error_cont.columnconfigure(0,weight=1)
+        
+        topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
+        topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
+        error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
+        error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
+        
+        close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
+                                     hover_color="red", fg_color="#242323",width=30,height=30,
+                                     command=(lambda : self.hide_error()))
+        close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
+        
+        error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
+        error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
+        error_frame.columnconfigure(0,weight=1)
+        
+
+        check = [len(self.id.get())==6,
+                 self.fname.get()!="",
+                 self.lname.get()!=""]
+        
+        ids = db.accounts.fetch_all_id()
+                
+        if not all(check):
+            error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))   
+        elif self.id.get() in ids:
+            error = ctk.CTkLabel(error_frame, text="user already exists", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))   
+        elif self.password.get()==self.confirm_password.get():
+            error = ctk.CTkLabel(error_frame, text="passwords do not match", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0)) 
+        else:
+            error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))
+        
+        okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
+                                     border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
+                                     command=(lambda : self.hide_error()))
+        okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
+        
+    def hide_error(self):
+        try:
+            self.error_cont.destroy()
+        except:
+            pass
