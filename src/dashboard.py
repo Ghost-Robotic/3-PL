@@ -1,3 +1,5 @@
+import sys
+sys.path.append("../3_PL")
 import customtkinter as ctk
 from PIL import Image, ImageTk
 import src.style as style
@@ -136,4 +138,25 @@ class Dashboard(ctk.CTkFrame):
                 self.filaments_button.configure(fg_color=style.dark_background)
             case "account":
                 self.account_button.configure(fg_color=style.dark_background)
+                
+if __name__ == "__main__":
+    class Test(ctk.CTk):
+        def __init__(self, *args, **kwargs):
+            self.access = True
+            self.current_user = 123456
+            self.auth_level = 5
+            ctk.CTk.__init__(self, *args, **kwargs)
+            self.rowconfigure(0, weight=1)
+            self.columnconfigure(0, weight=1)
+            
+            
+            dashboard = Dashboard(self,self)
+            dashboard.grid(row=0, column=0, sticky="nsew")       
+            dashboard.rowconfigure(0, weight=1)
+            dashboard.columnconfigure(0, weight=1)
+            
+            self.after(1, lambda : self.state('zoomed'))
+            
+    app = Test()
+    app.mainloop()
                 
