@@ -148,6 +148,7 @@ class Add(ctk.CTkFrame):
         r_input_frame = ctk.CTkFrame(container, fg_color=style.dark_foreground)
         r_input_frame.grid(row=0, column=1, sticky='nsew')
         r_input_frame.grid_columnconfigure(0, weight=1)
+        r_input_frame.grid_columnconfigure(1, weight=1)
         r_input_frame.rowconfigure(0, weight=1)
         r_input_frame.rowconfigure(1, weight=1)
         
@@ -156,23 +157,23 @@ class Add(ctk.CTkFrame):
         self.add_file_button = ctk.CTkButton(r_input_frame, width=200, image=self.plus, height=200, anchor='center', corner_radius=18, text="",
                                     fg_color="#272727", border_color="white", border_width=3, hover_color=style.dark_foreground,
                                     command=(lambda : self.upload_file()))
-        self.add_file_button.grid(row=0, column=0, padx=10,sticky="s")
+        self.add_file_button.grid(row=0, column=0, padx=10,sticky="s",columnspan=2)
         
         self.file_name = ctk.StringVar(value="*.gcode")
         file_label = ctk.CTkLabel(r_input_frame, textvariable=self.file_name, font=(style.normal_font, 18), text_color="white")
-        file_label.grid(row=1, column=0, sticky="n")
+        file_label.grid(row=1, column=0, sticky="n",columnspan=2)
         
         # reset form button
         reset_button = ctk.CTkButton(r_input_frame, width=88, height=45, fg_color="#FF2020", hover_color="#DA2020",
                                       text="Reset", font=(style.normal_font, 25), text_color="white",
                                       command=(lambda : self.reset_form()))
-        reset_button.grid(row=2, column=0, sticky="s", pady=(20,10))
+        reset_button.grid(row=2, column=0, sticky="se", pady=(20,14),padx=7)
         
         # submit form button
-        submit_button = ctk.CTkButton(r_input_frame, width=140, height=55, fg_color=style.main_green, hover_color="#1d966c",
+        submit_button = ctk.CTkButton(r_input_frame, width=140, height=53, fg_color=style.main_green, hover_color="#1d966c",
                                       text="Save", font=(style.bold_font, 30), text_color="white",
                                       command=(lambda : self.submit_form()))
-        submit_button.grid(row=3, column=0, sticky="s", pady=(10,40))
+        submit_button.grid(row=2, column=1, sticky="sw", pady=(20,10),padx=7)
         
 #=================================================================================================================================
     
