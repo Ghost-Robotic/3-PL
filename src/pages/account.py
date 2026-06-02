@@ -69,20 +69,20 @@ class AccountPage(ctk.CTkFrame):
         id_label = ctk.CTkLabel(id_frame, text="Your ID:", font=(style.normal_font, 25, "bold"), text_color="white")
         id_label.grid(row=0, column=0, padx=(0,20))
         id_entry = ctk.CTkLabel(id_frame, textvariable=current_id, width=100,
-                                   font=(style.normal_font, 22, "bold"), text_color="yellow", state="disabled")
+                                   font=(style.normal_font, 22, "bold"), text_color="yellow", state="disabled",anchor="w")
         id_entry.grid(row=0, column=1)
         
         username_frame = ctk.CTkFrame(self.profile_box,fg_color=style.dark_foreground)
         username_frame.grid(row=2, column=0, sticky="w", padx=10, pady=10)
         fname_label = ctk.CTkLabel(username_frame, text="First Name:", font=(style.normal_font, 25, "bold"), text_color="white")
         fname_label.grid(row=0, column=0, padx=(0,20))
-        fname_entry = ctk.CTkEntry(username_frame, textvariable=current_fname, width=300,
-                                   font=(style.normal_font, 22, "bold"), text_color="#f5f5f5", state="disabled")
+        fname_entry = ctk.CTkLabel(username_frame, textvariable=current_fname,
+                                   font=(style.normal_font, 22, "bold"), text_color="yellow", state="disabled",anchor="w")
         fname_entry.grid(row=0, column=1)
         lname_label = ctk.CTkLabel(username_frame, text="Last Name:", font=(style.normal_font, 25, "bold"), text_color="white")
         lname_label.grid(row=0, column=2, padx=(40,20))
-        lname_entry = ctk.CTkEntry(username_frame, textvariable=current_lname, width=300,
-                                   font=(style.normal_font, 22, "bold"), text_color="#f5f5f5", state="disabled")
+        lname_entry = ctk.CTkLabel(username_frame, textvariable=current_lname, width=300,
+                                   font=(style.normal_font, 22, "bold"), text_color="yellow", state="disabled",anchor="w")
         lname_entry.grid(row=0, column=3)
         
         auth_frame = ctk.CTkFrame(self.profile_box,fg_color=style.dark_foreground)
@@ -134,7 +134,7 @@ class AccountPage(ctk.CTkFrame):
         # submit form button
         submit_button = ctk.CTkButton(button_widget, width=75, height=35, fg_color=style.main_green, hover_color="#1d966c",
                                       text="Save", font=(style.normal_font, 25, "bold"), text_color="white",
-                                      command=(lambda : None))
+                                      command=(lambda : self.save_new_pass()))
         submit_button.grid(row=0, column=1, padx=10)
 
 #=================================================================================
@@ -349,11 +349,13 @@ class AccountPage(ctk.CTkFrame):
         try:
             if all(check):
                 salt = hsh.generate_salt()
-                db.accounts.create_user(id=self.id, f_name=self.fname,l_name=self.lname,access_level=self.auth_level, 
+                db.accounts.create_user(user_id=self.id.get(), f_name=self.fname.get(),l_name=self.lname.get(),access_level=self.auth_level.get(), 
                                         password=(hsh.hash(self.password.get(),salt)), salt=salt)
+                self.reset_form()
             else:
-                self.show_error()
-        except:
+                    self.show_error()
+        except Exception as e:
+            print(e)
             self.show_error()
         
         
@@ -368,7 +370,19 @@ class AccountPage(ctk.CTkFrame):
         self.hide_error()
         
     def save_new_pass(self):
-        pass
+        matched_password, salt = db.accounts.fetch_password(self.controller.current_user)
+        # hashes given password
+        hashed_password = hsh.hash(password=self.current_password.get(), salt=salt)
+        if matched_password == hashed_password:
+            if (self.new_pass.get() == self.new_pass2.get()) and self.new_pass.get()!="":
+                new_salt = hsh.generate_salt()
+                hashed_password = hsh.hash(password=self.new_pass.get(), salt=new_salt)
+                db.accounts.change_password(id=self.controller.current_user,password=hashed_password, salt=new_salt)
+                self.reset_pass()
+            else:
+                self.show_error(new_pass=2)
+        else:
+            self.show_error(new_pass=1)
     
     def reset_pass(self):
         self.current_password.set("")
@@ -393,7 +407,7 @@ class AccountPage(ctk.CTkFrame):
             self.add_pass_entry.configure(border_color="red")
             self.c_add_pass_entry.configure(border_color="red")
             
-    def show_error(self):
+    def show_error(self, new_pass=0):
         self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
         self.error_cont.grid(row=0, column=0)
         self.error_cont.rowconfigure(0,weight=1)
@@ -420,14 +434,20 @@ class AccountPage(ctk.CTkFrame):
                  self.lname.get()!=""]
         
         ids = db.accounts.fetch_all_id()
-                
-        if not all(check):
+       
+        if new_pass == 1:
+            error = ctk.CTkLabel(error_frame, text="incorrect pasword", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))  
+        elif new_pass == 2:
+            error = ctk.CTkLabel(error_frame, text="passwords do not match", font=(style.normal_font,20,"bold"), text_color="white")
+            error.grid(row=0,column=0, padx=(15,0))         
+        elif not all(check):
             error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
             error.grid(row=0,column=0, padx=(15,0))   
         elif self.id.get() in ids:
             error = ctk.CTkLabel(error_frame, text="user already exists", font=(style.normal_font,20,"bold"), text_color="white")
             error.grid(row=0,column=0, padx=(15,0))   
-        elif self.password.get()==self.confirm_password.get():
+        elif self.password.get()!=self.confirm_password.get():
             error = ctk.CTkLabel(error_frame, text="passwords do not match", font=(style.normal_font,20,"bold"), text_color="white")
             error.grid(row=0,column=0, padx=(15,0)) 
         else:
