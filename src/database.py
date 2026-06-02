@@ -95,7 +95,7 @@ class Users():
         self.cursor.execute('INSERT INTO users VALUES (?,?,?,?,?,?,?)', (user_id, password, salt, f_name, l_name, access_level, group_id))
         
     def change_password(self, id, password, salt):
-        self.cursor.execute('UPDATE users SET password=?. salt=? WHERE user_id=?', (password,salt,id))
+        self.cursor.execute('UPDATE users SET password=?, salt=? WHERE user_id=?', (password,salt,id))
         
     def fetch_password(self, user_id):
         """fetch hashed password and salt
