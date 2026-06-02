@@ -52,13 +52,6 @@ class App(ctk.CTk):
         #self.display_page(Dashboard)
         self.display_page(list(self.frames)[0])
            
-    
-    def setup_database(self):
-        self.accounts = Users(r"src\database\log.db")
-        self.logs = Logs(r"src\database\log.db")
-        self.printer_models = PrinterModels(r"src\database\log.db")
-        self.printers = Printers(r"src\database\log.db")
-        self.filaments = Filaments(r"src\database\log.db")
         
     def display_page(self, frame=None, index=None):
         page = self.frames[frame]
@@ -66,7 +59,6 @@ class App(ctk.CTk):
         
     def start(self): 
         self.after(1, lambda : self.state('zoomed'))
-        self.setup_database()
         self.mainloop()
         
     def login(self):
