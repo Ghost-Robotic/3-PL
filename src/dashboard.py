@@ -38,10 +38,10 @@ class Dashboard(ctk.CTkFrame):
                                     fg_color=style.dark_background, hover_color=style.dark_foreground, corner_radius=0)
         self.home_button.pack(side='left', fill="y", expand=True)
         #===========================================
-        self.add_log_button = ctk.CTkButton(nav_container, command=(lambda : self.set_page("add")),
-                                    text="+", font=("Segoe UI Black", 50),
-                                    fg_color=style.dark_background, hover_color=style.dark_foreground, corner_radius=0)
-        self.add_log_button.pack(side='left', fill="y", expand=True)
+        # self.add_log_button = ctk.CTkButton(nav_container, command=(lambda : self.set_page("add")),
+        #                             text="+", font=("Segoe UI Black", 50),
+        #                             fg_color=style.dark_background, hover_color=style.dark_foreground, corner_radius=0)
+        # self.add_log_button.pack(side='left', fill="y", expand=True)
         #===========================================
         self.log_button = ctk.CTkButton(nav_container, command=(lambda : self.set_page("log")),
                                     text="Log", font=("Segoe UI Black", 22),
@@ -73,7 +73,7 @@ class Dashboard(ctk.CTkFrame):
         box.columnconfigure(0, weight=1)   
                 
         self.pages = {}      
-        for page in (Home, Add, Log, PrintersPage, FilamentPage, AccountPage):
+        for page in (Home, Log, PrintersPage, FilamentPage, AccountPage):
             frame = page(box, controller)
             self.pages[page] = frame 
             frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)       
