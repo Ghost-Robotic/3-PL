@@ -198,7 +198,7 @@ class FilamentPage(ctk.CTkFrame):
         
         try:
             if not exist and all(check):
-                db.filaments.add_filament(material=self.material_name, weight=self.weight, amount=self.amount)
+                db.filaments.add_filament(material=self.material_name.get(), weight=self.weight.get(), amount=self.amount.get())
                 self.reset_form()
             else:
                 self.show_error()

@@ -2,6 +2,7 @@ import customtkinter as ctk
 import src.style as style
 import database as db
 from src.helpers.CTkXYFrame.ctk_xyframe import CTkXYFrame 
+from .add import Add
 
 class Log(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -21,28 +22,28 @@ class Log(ctk.CTkFrame):
         options = []
         if self.controller.auth_level != None:
             if self.controller.auth_level == 5:
-                options = [" View "," Add "]
+                options = [" Add "," View "]
             else:
-                options = [" View "]
+                options = [" Add "]
         option_button = ctk.CTkSegmentedButton(topbar, width=200, values=options, 
                                                font=(style.normal_font, 22), text_color="white",
                                                selected_color=style.main_blue, selected_hover_color=style.hover_blue,
                                                border_width=0, corner_radius=10,
                                                command=self.switch_subpage)
         option_button.grid(row=0,column=0, sticky="w",padx=25)
-        option_button.set(" View ")
+        option_button.set(" Add ")
         
         line = ctk.CTkFrame(topbar, height=5, fg_color="#585858")
         line.grid(row=1,column=0, sticky="we", padx=10, pady=(10,0))
 
-        content_box = ctk.CTkFrame(container,fg_color=style.dark_foreground)
-        content_box.grid(row=1, column=0, sticky="nsew")
-        content_box.rowconfigure(0, weight=1)
-        content_box.columnconfigure(0, weight=1)
+        self.content_box = ctk.CTkFrame(container,fg_color=style.dark_foreground)
+        self.content_box.grid(row=1, column=0, sticky="nsew")
+        self.content_box.rowconfigure(0, weight=1)
+        self.content_box.columnconfigure(0, weight=1)
         
 #=================================================================================
         # initialise view subpage
-        self.view_box = ctk.CTkFrame(content_box,fg_color=style.dark_foreground)
+        self.view_box = ctk.CTkFrame(self.content_box,fg_color=style.dark_foreground)
         self.view_box.grid(row=0, column=0, sticky="nsew", ipadx=10, ipady=10)
         self.view_box.rowconfigure(0, weight=1)
         self.view_box.rowconfigure(1, weight=30)
@@ -93,15 +94,28 @@ class Log(ctk.CTkFrame):
         
 #=================================================================================
 
-        self.grid_view()
+        self.grid_add()
 
 #=================================================================================
     def switch_subpage(self,page):
         match page:
+            case " Add ":
+                self.remove_view()
+                self.grid_add()
             case " View ":
-                #self.remove_add()
+                self.remove_add()
                 self.grid_view()
 
+    # display subpage to add log
+    def grid_add(self):
+        self.add = Add(self.content_box, self.controller)
+        self.add.grid(row=0, column=0, sticky="nsew")
+        self.add.rowconfigure(0, weight=1)
+        self.add.columnconfigure(0, weight=1)
+    
+    # hide subpage to ad log
+    def remove_add(self):
+        self.add.destroy()
     
     # display subpage to view logs        
     def grid_view(self):

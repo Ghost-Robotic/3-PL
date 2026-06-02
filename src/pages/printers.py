@@ -189,7 +189,7 @@ class PrintersPage(ctk.CTkFrame):
                  self.model_name.get().strip()!=""]
         try:
             if not (self.model_name.get().strip().lower() in models) and all(check):        
-                db.printer_models.add_printer_model(brand=self.brand, model_name=self.model_name, multimaterial=self.multi_material)
+                db.printer_models.add_printer_model(brand=self.brand.get(), model_name=self.model_name.get(), multimaterial=self.multi_material.get())
                 self.reset_form()
             else:
                 self.show_error()
