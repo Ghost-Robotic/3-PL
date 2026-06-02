@@ -2,6 +2,7 @@ import customtkinter as ctk
 import src.style as style
 import src.database as db
 import src.helpers.hash_utils as hsh
+import src.helpers.popup_utils as pop
 class AccountPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         self.controller = controller
@@ -10,7 +11,7 @@ class AccountPage(ctk.CTkFrame):
         container.grid(row=0, column=0, sticky='nsew', padx=25, pady=(5,25))
         container.columnconfigure(0, weight=1)
         container.rowconfigure(0, weight=1)
-        container.rowconfigure(1, weight=10)
+        container.rowconfigure(1, weight=50)
 
         
         topbar = ctk.CTkFrame(container, fg_color=style.dark_foreground)
@@ -49,6 +50,11 @@ class AccountPage(ctk.CTkFrame):
         #self.profile_box.rowconfigure(1, weight=1)
         #self.profile_box.columnconfigure(0, weight=1)
         self.profile_box.grid_remove()
+        
+        logout_button = ctk.CTkButton(content_box, command=(lambda : self.logout()), width=100, height=40, text="Logout", font=("Segoe UI Black", 30),
+                                      fg_color=style.main_blue, hover_color=style.hover_blue,text_color="white")
+        logout_button.grid(row=0,column=0,sticky="ne", padx=80, pady=10)
+        
         
         name = (db.accounts.fetch_name(self.controller.current_user)).split()
         
@@ -132,7 +138,7 @@ class AccountPage(ctk.CTkFrame):
         reset_button.grid(row=0, column=0, padx=10)
         
         # submit form button
-        submit_button = ctk.CTkButton(button_widget, width=75, height=35, fg_color=style.main_green, hover_color="#1d966c",
+        submit_button = ctk.CTkButton(button_widget, width=75, height=35, fg_color=style.main_green, hover_color=style.hover_green,
                                       text="Save", font=(style.normal_font, 25, "bold"), text_color="white",
                                       command=(lambda : self.save_new_pass()))
         submit_button.grid(row=0, column=1, padx=10)
@@ -152,9 +158,9 @@ class AccountPage(ctk.CTkFrame):
         header_frame.grid(row=0, column=0, sticky="nswe", padx=10,pady=0)
         header_frame._scrollbar.configure(height=0)
         table_header = ["ID", "Name", "Authentication Level"]
-        weights = [1,5,5]
+        self.weights = [1,5,5]
         for i in range(len(table_header)):
-            header_frame.columnconfigure(i, weight=weights[i], uniform=0)
+            header_frame.columnconfigure(i, weight=self.weights[i], uniform=0)
             frame = ctk.CTkFrame(header_frame, border_width=3, border_color=style.main_blue, corner_radius=8)
             frame.grid(row=0,column=i, ipadx=7, ipady=8, sticky="ew",padx=0)
             frame.rowconfigure(0, weight=1)
@@ -162,17 +168,17 @@ class AccountPage(ctk.CTkFrame):
             label = ctk.CTkLabel(frame, text=table_header[i], font=(style.normal_font, 20, "bold"))
             label.grid(row=0,column=0) 
         
-        table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
-        table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
+        self.table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
+        self.table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
         row_counter = 0
-        for i in weights:
-            table_frame.columnconfigure(row_counter, weight=i, uniform=0) 
+        for i in self.weights:
+            self.table_frame.columnconfigure(row_counter, weight=i, uniform=0) 
             row_counter += 1
         row_counter = 0
         for row in users:
             column_counter = 0
             for item in row:
-                frame = ctk.CTkFrame(table_frame, corner_radius=0)
+                frame = ctk.CTkFrame(self.table_frame, corner_radius=0)
                 frame.grid(row=row_counter,column=column_counter, ipadx=7, ipady=8, sticky="nsew",padx=0)
                 if (row_counter%2) == 1:
                     frame.configure(fg_color=style.dark_background)
@@ -196,7 +202,6 @@ class AccountPage(ctk.CTkFrame):
         self.add_box.grid_remove()
 
         val_id = self.register(self.validate_id)
-        val_auth = self.register(self.validate_auth)
         
         form_frame = ctk.CTkFrame(self.add_box, fg_color=style.dark_foreground)
         form_frame.grid(row=0,column=0, sticky="n")
@@ -277,7 +282,7 @@ class AccountPage(ctk.CTkFrame):
         reset_button.grid(row=0, column=0, padx=10)
         
         # submit form button
-        submit_button = ctk.CTkButton(buttons_frame, width=100, height=35, fg_color=style.main_green, hover_color="#1d966c",
+        submit_button = ctk.CTkButton(buttons_frame, width=100, height=35, fg_color=style.main_green, hover_color=style.hover_green,
                                       text="Save", font=(style.normal_font, 25, "bold"), text_color="white",
                                       command=(lambda : self.submit_form()))
         submit_button.grid(row=0, column=1, padx=10)
@@ -311,6 +316,34 @@ class AccountPage(ctk.CTkFrame):
     # display subpage to view all users        
     def grid_view(self):
         self.view_box.grid()
+        
+    def update_view(self):
+        self.table_frame.destroy()
+        
+        users = db.accounts.fetch_table()
+        self.table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
+        self.table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
+        row_counter = 0
+        for i in self.weights:
+            self.table_frame.columnconfigure(row_counter, weight=i, uniform=0) 
+            row_counter += 1
+        row_counter = 0
+        for row in users:
+            column_counter = 0
+            for item in row:
+                frame = ctk.CTkFrame(self.table_frame, corner_radius=0)
+                frame.grid(row=row_counter,column=column_counter, ipadx=7, ipady=8, sticky="nsew",padx=0)
+                if (row_counter%2) == 1:
+                    frame.configure(fg_color=style.dark_background)
+                else:
+                    frame.configure(fg_color=style.dark_foreground)
+                frame.rowconfigure(0, weight=1)
+                frame.columnconfigure(0, weight=1)
+                label = ctk.CTkLabel(frame, text=item, font=(style.normal_font, 17))
+                label.grid(row=0,column=0)
+                if column_counter == 0: label.configure(font=(style.normal_font, 17,'bold'))
+                column_counter += 1
+            row_counter += 1
     
     # hide subpage to view all users
     def remove_view(self):
@@ -326,11 +359,6 @@ class AccountPage(ctk.CTkFrame):
         
     def validate_id(self, num):
         if len(str(num)) > 6:
-            return False
-        return num.isdigit() or num == ""
-    
-    def validate_auth(self, num):
-        if 0 < len(str(num)) < 6:
             return False
         return num.isdigit() or num == ""
     
@@ -352,6 +380,8 @@ class AccountPage(ctk.CTkFrame):
                 db.accounts.create_user(user_id=self.id.get(), f_name=self.fname.get(),l_name=self.lname.get(),access_level=self.auth_level.get(), 
                                         password=(hsh.hash(self.password.get(),salt)), salt=salt)
                 self.reset_form()
+                pop.show_success(self, self.controller)
+                self.update_view()
             else:
                     self.show_error()
         except Exception as e:
@@ -379,6 +409,8 @@ class AccountPage(ctk.CTkFrame):
                 hashed_password = hsh.hash(password=self.new_pass.get(), salt=new_salt)
                 db.accounts.change_password(id=self.controller.current_user,password=hashed_password, salt=new_salt)
                 self.reset_pass()
+                pop.show_success(self, self.controller)
+                self.update_view()
             else:
                 self.show_error(new_pass=2)
         else:
@@ -464,3 +496,6 @@ class AccountPage(ctk.CTkFrame):
             self.error_cont.destroy()
         except:
             pass
+        
+    def logout(self):
+        self.controller.logout()

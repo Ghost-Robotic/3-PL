@@ -12,7 +12,7 @@ class Log(ctk.CTkFrame):
         container.grid(row=0, column=0, sticky='nsew', padx=25, pady=(5,25))
         container.columnconfigure(0, weight=1)
         container.rowconfigure(0, weight=1)
-        container.rowconfigure(1, weight=10)
+        container.rowconfigure(1, weight=20)
 
         
         topbar = ctk.CTkFrame(container, fg_color=style.dark_foreground)
@@ -57,9 +57,9 @@ class Log(ctk.CTkFrame):
         header_frame.grid(row=0, column=0, sticky="nswe", padx=10,pady=0)
         header_frame._scrollbar.configure(height=0)
         table_header = ["ID", "User","Name", "Duration", "Weight (g)", "Printer", "Filament", "Time", "Date"]
-        weights = [1,3,3,2,2,3,3,2,2]
+        self.weights = [1,3,3,2,2,3,3,2,2]
         for i in range(len(table_header)):
-            header_frame.columnconfigure(i, weight=weights[i], uniform=0)
+            header_frame.columnconfigure(i, weight=self.weights[i], uniform=0)
             frame = ctk.CTkFrame(header_frame, border_width=3, border_color=style.main_blue, corner_radius=8)
             frame.grid(row=0,column=i, ipadx=7, ipady=8, sticky="nsew",padx=0)
             frame.rowconfigure(0, weight=1)
@@ -67,17 +67,17 @@ class Log(ctk.CTkFrame):
             label = ctk.CTkLabel(frame, text=table_header[i], font=(style.normal_font, 20, "bold"))
             label.grid(row=0,column=0) 
             
-        table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
-        table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
+        self.table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
+        self.table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
         row_counter = 0
-        for i in weights:
-            table_frame.columnconfigure(row_counter, weight=i, uniform=0) 
+        for i in self.weights:
+            self.table_frame.columnconfigure(row_counter, weight=i, uniform=0) 
             row_counter += 1
         row_counter = 0
         for row in log_table:
             column_counter = 0
             for item in row:
-                frame = ctk.CTkFrame(table_frame, corner_radius=0)
+                frame = ctk.CTkFrame(self.table_frame, corner_radius=0)
                 frame.grid(row=row_counter,column=column_counter, ipadx=7, ipady=8, sticky="nsew",padx=0)
                 if (row_counter%2) == 1:
                     frame.configure(fg_color=style.dark_background)
@@ -93,7 +93,10 @@ class Log(ctk.CTkFrame):
         
         
 #=================================================================================
-
+        self.add = Add(self.content_box, self.controller, self)
+        self.add.grid(row=0, column=0, sticky="nsew")
+        self.add.rowconfigure(0, weight=1)
+        self.add.columnconfigure(0, weight=1)
         self.grid_add()
 
 #=================================================================================
@@ -108,18 +111,43 @@ class Log(ctk.CTkFrame):
 
     # display subpage to add log
     def grid_add(self):
-        self.add = Add(self.content_box, self.controller)
-        self.add.grid(row=0, column=0, sticky="nsew")
-        self.add.rowconfigure(0, weight=1)
-        self.add.columnconfigure(0, weight=1)
+        self.add.grid()
     
     # hide subpage to ad log
     def remove_add(self):
-        self.add.destroy()
+        self.add.grid_remove()
     
     # display subpage to view logs        
     def grid_view(self):
         self.view_box.grid()
+        
+    def update_view(self):
+        self.table_frame.destroy()
+        
+        log_table = db.logs.fetch_table()
+        self.table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
+        self.table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
+        row_counter = 0
+        for i in self.weights:
+            self.table_frame.columnconfigure(row_counter, weight=i, uniform=0) 
+            row_counter += 1
+        row_counter = 0
+        for row in log_table:
+            column_counter = 0
+            for item in row:
+                frame = ctk.CTkFrame(self.table_frame, corner_radius=0)
+                frame.grid(row=row_counter,column=column_counter, ipadx=7, ipady=8, sticky="nsew",padx=0)
+                if (row_counter%2) == 1:
+                    frame.configure(fg_color=style.dark_background)
+                else:
+                    frame.configure(fg_color=style.dark_foreground)
+                frame.rowconfigure(0, weight=1)
+                frame.columnconfigure(0, weight=1)
+                label = ctk.CTkLabel(frame, text=item, font=(style.normal_font, 17))
+                label.grid(row=0,column=0)
+                if column_counter == 0: label.configure(font=(style.normal_font, 17,'bold'))
+                column_counter += 1
+            row_counter += 1
     
     # hide subpage to view logs
     def remove_view(self):

@@ -3,10 +3,12 @@ import src.style as style
 import shutil
 from PIL import Image, ImageTk
 import src.database as db
+import src.helpers.popup_utils as pop
 
 class Add(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, parent_controller=None):
         self.controller = controller
+        self.parent_controller = parent_controller
         self.gcode_source = None
         self.file_name = ctk.StringVar()
         self.print_name = ctk.StringVar()
@@ -170,7 +172,7 @@ class Add(ctk.CTkFrame):
         reset_button.grid(row=2, column=0, sticky="se", pady=(20,14),padx=7)
         
         # submit form button
-        submit_button = ctk.CTkButton(r_input_frame, width=140, height=53, fg_color=style.main_green, hover_color="#1d966c",
+        submit_button = ctk.CTkButton(r_input_frame, width=140, height=53, fg_color=style.main_green, hover_color=style.hover_green,
                                       text="Save", font=(style.bold_font, 30), text_color="white",
                                       command=(lambda : self.submit_form()))
         submit_button.grid(row=2, column=1, sticky="sw", pady=(20,10),padx=7)
@@ -221,6 +223,8 @@ class Add(ctk.CTkFrame):
                 
                 shutil.copy2(str(self.gcode_source), r"src\database\gcode")
                 self.reset_form()
+                pop.show_success(self, self.controller)
+                self.parent_controller.update_view()
             except:
                 self.show_error()            
         else:
