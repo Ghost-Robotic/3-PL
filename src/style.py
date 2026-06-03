@@ -1,6 +1,10 @@
 main_blue = "#00a2ff"
+hover_blue = "#0087d4"
 
-main_green = "#05ac71"
+main_green = "#00ac09"
+hover_green = "#0a8510"
+
+grey = "#585858"
 
 bold_font = "Segoe UI Black"
 
@@ -9,6 +13,10 @@ normal_font = "Segoe UI"
 dark_background = "#2b2b2b"
 
 dark_foreground= "#1B1B1B"
+
+# dark_background = "#1B1B1B"
+
+# dark_foreground= "#2b2b2b"
 
 # Source - https://stackoverflow.com/a/53717785
 # Posted by jimmiesrustled, modified by community. See post 'Timeline' for change history
