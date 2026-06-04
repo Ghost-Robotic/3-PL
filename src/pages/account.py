@@ -45,7 +45,7 @@ class AccountPage(ctk.CTkFrame):
 #=================================================================================
         # initialise profile subpage
         self.profile_box = ctk.CTkScrollableFrame(content_box,fg_color=style.dark_foreground)
-        self.profile_box.grid(row=0, column=0, sticky="nsew", ipadx=20, ipady=10, padx=30)
+        self.profile_box.grid(row=0, column=0, sticky="nsew", ipadx=20, ipady=10, padx=30,pady=(10,0))
         #self.profile_box.rowconfigure(0, weight=1)
         #self.profile_box.rowconfigure(1, weight=1)
         #self.profile_box.columnconfigure(0, weight=1)
