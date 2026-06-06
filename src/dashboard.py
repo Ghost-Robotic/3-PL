@@ -87,9 +87,10 @@ class Dashboard(ctk.CTkFrame):
                
         self.current_page="home"
         self.set_page("home") 
+        self.home_button.configure(fg_color=style.dark_foreground)
         
     def page_constructor(self, page): 
-        frame = page(self.box,self.controller)
+        frame = page(self.box,self.controller, self)
         self.pages[page] = frame
         frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)       
         frame.rowconfigure(0, weight=1)
@@ -116,7 +117,10 @@ class Dashboard(ctk.CTkFrame):
                     self.current_page = "home"
                     self.home_button.configure(fg_color=style.dark_foreground)
                 except:
+                    self.reset_tab(self.current_page)
+                    self.home_button.configure(fg_color=style.dark_foreground)
                     self.page_constructor(Home)
+                    self.current_page = "home"
             # case "add":
             #     self.display_page(Add)
             #     self.reset_tab(self.current_page)
@@ -129,6 +133,9 @@ class Dashboard(ctk.CTkFrame):
                     self.current_page = "log"
                     self.log_button.configure(fg_color=style.dark_foreground)
                 except:
+                    self.reset_tab(self.current_page)
+                    self.log_button.configure(fg_color=style.dark_foreground)                    
+                    self.current_page = "log"                    
                     self.loading_frame()
                     self.page_constructor(Log)
             case "printers":
@@ -138,8 +145,11 @@ class Dashboard(ctk.CTkFrame):
                     self.current_page = "printers"
                     self.printers_button.configure(fg_color=style.dark_foreground)
                 except:
+                    self.reset_tab(self.current_page)
+                    self.printers_button.configure(fg_color=style.dark_foreground)
                     self.loading_frame()
                     self.page_constructor(PrintersPage)
+                    self.current_page = "printers"
             case "filaments":
                 try:
                     self.display_page(FilamentPage)
@@ -147,8 +157,11 @@ class Dashboard(ctk.CTkFrame):
                     self.current_page = "filaments"
                     self.filaments_button.configure(fg_color=style.dark_foreground)
                 except:
+                    self.reset_tab(self.current_page)
+                    self.filaments_button.configure(fg_color=style.dark_foreground)
                     self.loading_frame()
                     self.page_constructor(FilamentPage)
+                    self.current_page = "filaments"
             case "account":
                 try:
                     self.display_page(AccountPage)
@@ -156,8 +169,11 @@ class Dashboard(ctk.CTkFrame):
                     self.current_page = "account"
                     self.account_button.configure(fg_color=style.dark_foreground)
                 except:
+                    self.reset_tab(self.current_page)
+                    self.account_button.configure(fg_color=style.dark_foreground)
                     self.loading_frame()
                     self.page_constructor(AccountPage)
+                    self.current_page = "account"
                 
     def reset_tab(self, tab):
         match tab:
