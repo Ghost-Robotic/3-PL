@@ -1,12 +1,12 @@
 import customtkinter as ctk
 import src.style as style
-import src.database as db
 import src.helpers.popup_utils as pop
 
 
 class PrintersPage(ctk.CTkFrame):
     def __init__(self, parent, controller, parent_controller):
         self.controller = controller
+        self.parent_controller = parent_controller
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
         container.grid(row=0, column=0, sticky='nsew', padx=25, pady=(5,25))
@@ -49,7 +49,7 @@ class PrintersPage(ctk.CTkFrame):
         self.view_box.rowconfigure(1, weight=30)
         self.view_box.columnconfigure(0, weight=1)
         self.view_box.grid_remove()
-        models = db.printer_models.fetch_all()
+        models = self.controller.printer_models.fetch_all()
         
         header_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground, height=35,
                                               scrollbar_button_color=style.dark_foreground, scrollbar_button_hover_color=style.dark_foreground)
@@ -168,7 +168,7 @@ class PrintersPage(ctk.CTkFrame):
     def update_view(self):
         self.table_frame.destroy()
         
-        models = db.printer_models.fetch_all()
+        models = self.controller.printer_models.fetch_all()
         self.table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
         self.table_frame.grid(row=1, column=0, sticky="nsew", padx=10)
         row_counter = 0
@@ -218,12 +218,12 @@ class PrintersPage(ctk.CTkFrame):
             var.set(0)
             
     def submit_form(self):
-        models = db.printer_models.fetch_all_names()
+        models = self.controller.printer_models.fetch_all_names()
         check = [self.brand.get().strip()!="",
                  self.model_name.get().strip()!=""]
         try:
             if not (self.model_name.get().strip().lower() in models) and all(check):        
-                db.printer_models.add_printer_model(brand=self.brand.get(), model_name=self.model_name.get(), multimaterial=self.multi_material.get())
+                self.controller.printer_models.add_printer_model(brand=self.brand.get(), model_name=self.model_name.get(), multimaterial=self.multi_material.get())
                 self.reset_form()
                 pop.show_success(self, self.controller)
                 self.update_view()
@@ -240,44 +240,45 @@ class PrintersPage(ctk.CTkFrame):
         
         
     def show_error(self):
-        self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
-        self.error_cont.grid(row=0, column=0)
-        self.error_cont.rowconfigure(0,weight=1)
-        self.error_cont.rowconfigure(1,weight=5)
-        self.error_cont.columnconfigure(0,weight=1)
-        
-        topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
-        topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
-        error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
-        error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
-        
-        close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
-                                     hover_color="red", fg_color="#242323",width=30,height=30,
-                                     command=(lambda : self.hide_error()))
-        close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
-        
-        error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
-        error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
-        error_frame.columnconfigure(0,weight=1)
-        
-        check = [self.brand.get().strip()!="",
-                 self.model_name.get().strip()!=""]
-        models = db.printer_models.fetch_all_names()
-        
-        if not all(check):
-            error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))   
-        elif (self.model_name.get().strip().lower() in models):
-            error = ctk.CTkLabel(error_frame, text="model already exists", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))   
-        else:
-            error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))
-        
-        okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
-                                     border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
-                                     command=(lambda : self.hide_error()))
-        okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
+        if len(self.winfo_children()) <= 1:
+            self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
+            self.error_cont.grid(row=0, column=0)
+            self.error_cont.rowconfigure(0,weight=1)
+            self.error_cont.rowconfigure(1,weight=5)
+            self.error_cont.columnconfigure(0,weight=1)
+            
+            topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
+            topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
+            error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
+            error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
+            
+            close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
+                                        hover_color="red", fg_color="#242323",width=30,height=30,
+                                        command=(lambda : self.hide_error()))
+            close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
+            
+            error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
+            error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
+            error_frame.columnconfigure(0,weight=1)
+            
+            check = [self.brand.get().strip()!="",
+                    self.model_name.get().strip()!=""]
+            models = self.controller.printer_models.fetch_all_names()
+            
+            if not all(check):
+                error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))   
+            elif (self.model_name.get().strip().lower() in models):
+                error = ctk.CTkLabel(error_frame, text="model already exists", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))   
+            else:
+                error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))
+            
+            okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
+                                        border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
+                                        command=(lambda : self.hide_error()))
+            okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
         
     def hide_error(self):
         try:
