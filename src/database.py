@@ -321,11 +321,3 @@ class Logs:
             
             rows.append(columns)
         return rows 
-        
-class Database:
-    def __init__(self):
-        self.accounts = Users(r"database\log.db")
-        self.logs = Logs(r"database\log.db")
-        self.printer_models = PrinterModels(r"database\log.db")
-        self.printers = Printers(r"database\log.db")
-        self.filaments = Filaments(r"database\log.db")
