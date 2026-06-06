@@ -1,11 +1,11 @@
 import customtkinter as ctk
 import src.style as style
-import database as db
+import src.database as db
 from src.helpers.CTkXYFrame.ctk_xyframe import CTkXYFrame 
 from .add import Add
 
 class Log(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, parent_controller):
         self.controller = controller
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
@@ -120,6 +120,7 @@ class Log(ctk.CTkFrame):
     # display subpage to view logs        
     def grid_view(self):
         self.view_box.grid()
+        #self.update_view()
         
     def update_view(self):
         self.table_frame.destroy()
