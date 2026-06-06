@@ -1,16 +1,25 @@
 import customtkinter as ctk
-from os import system, name
+import os
+import sys
 from src.login import Login 
 from src.dashboard import Dashboard
 from src.database import Users, Logs, PrinterModels, Printers, Filaments
 import src.database as db
 from PIL import Image, ImageTk
-import style 
+import src.style as style
 from src.helpers.loading import Loading
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
 class App(ctk.CTk):
     def __init__(self, *args, **kwargs):
+        self.database = r"database\log.db"
+        
         self.access = False
         self.current_user = None
         self.auth_level = None
