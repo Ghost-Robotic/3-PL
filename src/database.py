@@ -1,77 +1,20 @@
 import sqlite3 as sql
+import os
+import sys
 
-# class Database:
-#     def __init__(self):
-#         self.connection = sql.connect('src\database\log.db')
-#         # self.table = table
-#         # self.prim_key = prim_key
-#         # self.columns = columns or []
-        
-#         self.cursor = self.connection.cursor()
-        
-#         # cursor.execute(f'CREATE TABLE IF NOT EXISTS {table} ({prim_key} INTEGER)')
-#         # cursor.execute(f'INSERT INTO {table} VALUES (2)')
-        
-#         # self.connection.commit()
-        
-#         # cursor.execute(f'SELECT {prim_key} from {table}')
-#         # print(cursor.fetchall())
-#         # self.connection.close()
-        
-#     def create_table(self, table, prim_key, columns=None):
-#         """Adds new table to database
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
 
-#         Args:
-#             table (str): name of the table
-#             prim_key (int): primary key for the table_
-#             columns (str, str): name and data type for each column (e.g. [[f_name, TEXT], [age, INTEGER]]). Defaults to None.
-#         """
-#         columns = columns or []
-#         cursor = self.connection.cursor()
-#         cursor.execute(f'CREATE TABLE IF NOT EXISTS {table} ({prim_key} INTEGER)')
-        
-#         for column in columns:
-#             cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column[0]} {column[1]}")
-
-# # database = Database()
-# # database.create_table("band", "id", [["hello", "TEXT"], ["age", "INTEGER"]])
-# # print(database.cursor.fetchall())
-
-# class Table:
-#     def __init__(self, database, table=None, prim_key=None, columns=None):
-#         self.connection =sql.connect(database)
-#         self.cursor = self.connection.cursor()
-#         self.table = table
-#         self.prim_key = prim_key
-#         self.columns = columns or []
-        
-#     def create_table(self, table, prim_key):
-#         """Adds new table to database
-
-#         Args:
-#             table (str): name of the table
-#             prim_key (int): primary key for the table_
-#             columns (str, str): name and data type for each column (e.g. [[f_name, TEXT], [age, INTEGER]]). Defaults to None.
-#         """
-#         #columns = columns or []
-#         #cursor = self.connection.cursor()
-#         self.cursor.execute(f'CREATE TABLE IF NOT EXISTS {self.table} ({prim_key} INTEGER)') 
-        
-#     def add_column(self, name, type):
-#         self.cursor.execute(f"ALTER TABLE {self.table} ADD COLUMN {name} {type}")
-        
-#     def output(self):
-#         print(self.cursor.fetchall())
-        
-# database = Table(database='src\Database\log.db')
-# database.create_table("people", "f_name")
-# database.add_column('age', 'INTEGER')
-# database.add_column('hello', 'TEXT')
+database = resource_path(r"database\log.db")
     
 class Users():
     def __init__(self, database):
         self.connection =sql.connect(database, autocommit=True)
-        self.connection.execute('PRAGMA forgeign_keys = ON')
+        self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
@@ -156,7 +99,7 @@ class Users():
 class Groups():
     def __init__(self, database):
         self.connection =sql.connect(database, autocommit=True)
-        self.connection.execute('PRAGMA forgeign_keys = ON')
+        self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
@@ -177,7 +120,7 @@ class Groups():
 class PrinterModels:
     def __init__(self, database):
         self.connection =sql.connect(database, autocommit=True)
-        self.connection.execute('PRAGMA forgeign_keys = ON')
+        self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
@@ -236,7 +179,7 @@ class PrinterModels:
 class Printers:
     def __init__(self, database):
         self.connection =sql.connect(database, autocommit=True)
-        self.connection.execute('PRAGMA forgeign_keys = ON')
+        self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
@@ -260,7 +203,7 @@ class Printers:
 class Filaments:
     def __init__(self, database):
         self.connection =sql.connect(database, autocommit=True)
-        self.connection.execute('PRAGMA forgeign_keys = ON')
+        self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
@@ -301,31 +244,31 @@ class Filaments:
 class Logs:
     def __init__(self, database):
         self.connection =sql.connect(database, autocommit=True)
-        self.connection.execute('PRAGMA forgeign_keys = ON')
+        self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS logs (
             print_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT,
+            id_user TEXT,
             print_name TEXT,
             gcode TEXT,
             duration INTEGER,
-            weight INTEGER,
+            model_weight INTEGER,
             date_time TEXT,
-            printer_id INTEGER,
-            filament_id INTEGER,
+            id_model INTEGER,
+            id_filament INTEGER,
             approval BOOLEAN,
-            approver_id INTEGER
+            approver_id INTEGER,
             successful BOOLEAN,
             
-            FOREIGN KEY (user_id)
+            FOREIGN KEY (id_user)
                 REFERENCES users (user_id),
                 
-            FOREIGN KEY (model_id)
+            FOREIGN KEY (id_model)
                 REFERENCES printer_models (model_id),
                 
-            FOREIGN KEY (filament_id)
+            FOREIGN KEY (id_filament)
                 REFERENCES filaments (filament_id),
                 
             FOREIGN KEY (approver_id)
@@ -335,7 +278,7 @@ class Logs:
     def view_table(self):
         """prints entire table
         """
-        for row in self.cursor.execute('SELECT * FROM users'):
+        for row in self.cursor.execute('SELECT * FROM logs'):
             print(row)
             
     def add_log(self, user_id, print_name, gcode, duration, weight, printer_id, filament_id, approval=None, approver_id=None, successful=None):
@@ -350,11 +293,15 @@ class Logs:
     
     def fetch_table(self):
         rows = []
-        for row in self.cursor.execute('SELECT print_id, user_id, print_name, duration, weight, printer_id, filament_id, date_time FROM logs'):
+        for row in self.cursor.execute("""SELECT print_id, id_user, print_name, duration, model_weight, id_model, id_filament, date_time 
+                                       FROM logs
+                                       JOIN users ON logs.id_user = users.user_id
+                                       JOIN printer_models ON logs.id_model = printer_models.model_id
+                                       JOIN filaments ON logs.id_filament = filaments.filament_id"""):
             columns = []
             columns.append(str(row[0]))
             
-            name = accounts.fetch_name(row[1])
+            name = "accounts.fetch_name(row[1])"
             columns.append(name)
             
             columns.append(row[2])
@@ -365,8 +312,8 @@ class Logs:
 
             columns.append(row[4])
             
-            columns.append(printer_models.fetch_name(row[5]))
-            columns.append(filaments.fetch_name(row[6]))
+            columns.append("printer_models.fetch_name(row[5])")
+            columns.append("filaments.fetch_name(row[6])")
             
             datetime = row[7].split()
             columns.append(datetime[1])
@@ -376,8 +323,8 @@ class Logs:
         return rows 
         
     
-accounts = Users(r"src\database\log.db")
-logs = Logs(r"src\database\log.db")
-printer_models = PrinterModels(r"src\database\log.db")
-printers = Printers(r"src\database\log.db")
-filaments = Filaments(r"src\database\log.db")
+accounts = Users(r"database\log.db")
+logs = Logs(r"database\log.db")
+printer_models = PrinterModels(r"database\log.db")
+printers = Printers(r"database\log.db")
+filaments = Filaments(r"database\log.db")
