@@ -57,6 +57,12 @@ class App(ctk.CTk):
         #self.display_page(Login)  
         #self.display_page(Dashboard)
         #self.display_page(list(self.frames)[0])
+        
+        self.accounts = Users(self.database)
+        self.logs = Logs(self.database)
+        self.printer_models = PrinterModels(self.database)
+        self.printers = Printers(self.database)
+        self.filaments = Filaments(self.database)
            
         
     def display_page(self, frame=None, index=None):
@@ -64,13 +70,14 @@ class App(ctk.CTk):
         page.tkraise()                        
         
     def start(self): 
+        ctk.set_appearance_mode('dark')
         self.after(1, lambda : self.state('zoomed'))
         self.mainloop()
         
     def login(self):
         if self.access == True and len(self.current_user) == 6:
 
-            self.auth_level = db.accounts.fetch_auth(self.current_user)
+            self.auth_level = self.accounts.fetch_auth(self.current_user)
             for page in ((Dashboard,)):
                 frame = page(self.container, self)
                 self.frames[page] = frame 
