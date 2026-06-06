@@ -19,7 +19,7 @@ class Home(ctk.CTkFrame):
         img_container.columnconfigure(0, weight=1)
         img_container.rowconfigure(0, weight=1)
         
-        img = ctk.CTkImage(dark_image=Image.open(self.random_img()),size=(500,500))
+        img = ctk.CTkImage(dark_image=Image.open(self.random_img()),size=(600,600))
         
         self.img_label = ctk.CTkButton(img_container, image=img, command=self.change_img, text="", hover=False, fg_color=style.dark_foreground)
         self.img_label.grid(row=0, column=0)
@@ -44,9 +44,6 @@ class Home(ctk.CTkFrame):
                                    width=280, height=50,anchor="w")
             button.pack(side='top', pady=8)
             
-        #parent_controller.set_page(nav_tabs[0])
-        
-        print(parent_controller.pages)
         
         self.admin_buttons_cont = ctk.CTkFrame(container)
         
@@ -55,6 +52,6 @@ class Home(ctk.CTkFrame):
     
     def change_img(self):
         self.after_cancel(self.img_cycle)
-        img = ctk.CTkImage(dark_image=Image.open(self.random_img()),size=(500,500))
+        img = ctk.CTkImage(dark_image=Image.open(self.random_img()),size=(600,600))
         self.img_label.configure(image=img)
         self.img_cycle = self.after(5000, self.change_img)
