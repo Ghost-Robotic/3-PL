@@ -4,7 +4,7 @@ import src.database as db
 import src.helpers.hash_utils as hsh
 import src.helpers.popup_utils as pop
 class AccountPage(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, parent_controller):
         self.controller = controller
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
