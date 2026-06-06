@@ -293,38 +293,39 @@ class Logs:
     
     def fetch_table(self):
         rows = []
-        for row in self.cursor.execute("""SELECT print_id, id_user, print_name, duration, model_weight, id_model, id_filament, date_time 
-                                       FROM logs
-                                       JOIN users ON logs.id_user = users.user_id
-                                       JOIN printer_models ON logs.id_model = printer_models.model_id
-                                       JOIN filaments ON logs.id_filament = filaments.filament_id"""):
+        for row in self.cursor.execute("""SELECT l.print_id, u.f_name, u.l_name, l.print_name, l.duration, l.model_weight, pm.brand, pm.model_name, f.material, l.date_time 
+                                       FROM logs AS l
+                                       JOIN users AS u ON l.id_user = u.user_id
+                                       JOIN printer_models AS pm ON l.id_model = pm.model_id
+                                       JOIN filaments AS f ON l.id_filament = f.filament_id"""):
             columns = []
             columns.append(str(row[0]))
             
-            name = "accounts.fetch_name(row[1])"
+            name = str(row[1]) + " " + str(row[2])
             columns.append(name)
             
-            columns.append(row[2])
+            columns.append(row[3])
 
-            hours = row[3]//60
-            mins = row[3]%60
+            hours = row[4]//60
+            mins = row[4]%60
             columns.append(str(hours)+"hrs "+str(mins)+"mins")
 
-            columns.append(row[4])
+            columns.append(row[5])
             
-            columns.append("printer_models.fetch_name(row[5])")
-            columns.append("filaments.fetch_name(row[6])")
+            columns.append(f"{str(row[6])} {str(row[7])}")
+            columns.append(str(row[8]))
             
-            datetime = row[7].split()
+            datetime = row[9].split()
             columns.append(datetime[1])
             columns.append(datetime[0])
             
             rows.append(columns)
         return rows 
         
-    
-accounts = Users(r"database\log.db")
-logs = Logs(r"database\log.db")
-printer_models = PrinterModels(r"database\log.db")
-printers = Printers(r"database\log.db")
-filaments = Filaments(r"database\log.db")
+class Database:
+    def __init__(self):
+        self.accounts = Users(r"database\log.db")
+        self.logs = Logs(r"database\log.db")
+        self.printer_models = PrinterModels(r"database\log.db")
+        self.printers = Printers(r"database\log.db")
+        self.filaments = Filaments(r"database\log.db")
