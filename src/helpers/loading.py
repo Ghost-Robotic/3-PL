@@ -6,6 +6,7 @@ import math
 from PIL import Image, ImageTk
 
 class Loading(ctk.CTkFrame):
+    """loading animations frame"""
     def __init__(self, parent, controller):
         self.controller = controller
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background)
@@ -14,6 +15,7 @@ class Loading(ctk.CTkFrame):
 
 
     def grid_triple(self):
+        """animation with three stacked lines"""
         self.container = ctk.CTkCanvas(self, width=800, height=800, bg=style.dark_background, borderwidth=0,highlightthickness=0)
         self.container.grid(row=0,column=0)        
         
@@ -40,6 +42,7 @@ class Loading(ctk.CTkFrame):
         self.increase_triple()
         
     def increase_triple(self):
+        """begin animation"""
         if self.line_3_x < 399.99:      
             percentage = (self.line_3_x)/self.distance
             #print(f"{step} , {percentage} , {self.line_3_x}")
@@ -77,6 +80,7 @@ class Loading(ctk.CTkFrame):
         
         
     def grid_single(self):
+        """loading animation with single line"""
         self.length = 800
         self.height = 70
         size = 200
@@ -101,6 +105,7 @@ class Loading(ctk.CTkFrame):
         self.increase_single()
         
     def increase_single(self):
+        """begin animation"""
         if self.linex < (self.length-0.01):      
             percentage = (self.linex)/self.length
             change = self.speed  + ((5/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))

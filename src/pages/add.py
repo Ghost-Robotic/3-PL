@@ -213,6 +213,7 @@ class Add(ctk.CTkFrame):
             
         
     def submit_form(self):
+        """add new print job to database"""
         if self.validate():
             try:
                 self.duration = int(self.hours.get())*60 + int(self.mins.get())
@@ -227,7 +228,8 @@ class Add(ctk.CTkFrame):
                 self.reset_form() 
                 pop.show_success(self, self.controller)
                 self.parent_controller.update_view()
-            except:
+            except Exception as e:
+                print(e)
                 self.show_error()            
         else:
             self.show_error()

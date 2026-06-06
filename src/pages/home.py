@@ -14,6 +14,7 @@ class Home(ctk.CTkFrame):
         container.columnconfigure(0, weight=1)
         container.rowconfigure(0, weight=1)
         
+        # container with cycling images
         img_container = ctk.CTkFrame(container, fg_color=style.dark_foreground)
         img_container.grid(row=0, column=0, sticky="nsew", rowspan=2)
         img_container.columnconfigure(0, weight=1)
@@ -25,6 +26,7 @@ class Home(ctk.CTkFrame):
         self.img_label.grid(row=0, column=0)
         self.img_cycle = self.after(5000, self.change_img)
         
+        # buttons on left of screen
         nav_tabs = {"log" : "Add New Print Job",
                     "printers" : "View Available Printers",
                     "filaments" : "View Available Filament",
@@ -44,7 +46,7 @@ class Home(ctk.CTkFrame):
                                    width=280, height=50,anchor="w")
             button.pack(side='top', pady=8)
             
-        
+        # buttons on right of screen only available to admins
         self.admin_buttons_cont = ctk.CTkFrame(container)
         
     def random_img(self):

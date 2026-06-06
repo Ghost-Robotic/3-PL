@@ -102,21 +102,26 @@ class Login(ctk.CTkFrame):
         
         
     def show_error(self):
+        """grid error label"""
         self.error_label.grid()
         
     def hide_error(self):
+        """hide error lavel"""
         self.error_label.grid_remove()
         
     def help(self):
+        """toggle help label"""
         if self.help_label.winfo_viewable():
             self.help_label.grid_remove()
         else:
             self.help_label.grid()
             
     def clear_username(self):
+        """clear username entry field"""
         self.username.delete(0, ctk.END)
         
     def clear_password(self):
+        """clear passoword entry field"""
         self.password.delete(0, ctk.END)
                        
     def random_img(self):
@@ -135,6 +140,7 @@ class Login(ctk.CTkFrame):
         return id.isdigit() or id==""
         
     def submit(self):
+        """login if username and password are valid"""
         if self.username.get() != "" and self.password.get() != "":
             try:
                 # gets corresponding hashed password and salt for given user_id
@@ -158,7 +164,8 @@ class Login(ctk.CTkFrame):
                     
                 else:
                     raise Exception("Incorrect Password")
-            except:
+            except Exception as e:
+                print(e)
                 self.clear_password()
                 self.show_error()
         else:

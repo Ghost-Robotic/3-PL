@@ -168,6 +168,7 @@ class FilamentPage(ctk.CTkFrame):
         self.view_box.grid()
         
     def update_view(self):
+        """refresh view table"""
         self.table_frame.destroy()
         
         filaments = self.controller.filaments.fetch_all()
@@ -215,6 +216,7 @@ class FilamentPage(ctk.CTkFrame):
             var.set(0)
             
     def submit_form(self):
+        """add new material to database"""
         materials = list(self.controller.filaments.fetch_names().keys())
         
         check = [self.material_name.get().strip()!="",
@@ -234,7 +236,8 @@ class FilamentPage(ctk.CTkFrame):
                 self.update_view()
             else:
                 self.show_error()
-        except:
+        except Exception as e:
+            print(e)
             self.show_error()
     
     def reset_form(self):

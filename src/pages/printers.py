@@ -218,6 +218,7 @@ class PrintersPage(ctk.CTkFrame):
             var.set(0)
             
     def submit_form(self):
+        """add new printer model"""
         models = self.controller.printer_models.fetch_all_names()
         check = [self.brand.get().strip()!="",
                  self.model_name.get().strip()!=""]
@@ -229,7 +230,8 @@ class PrintersPage(ctk.CTkFrame):
                 self.update_view()
             else:
                 self.show_error()
-        except:
+        except Exception as e:
+            print(e)
             self.show_error()
     
     def reset_form(self):

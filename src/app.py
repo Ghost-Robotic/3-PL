@@ -46,6 +46,7 @@ class App(ctk.CTk):
         frame.grid(row=0, column=0, sticky="nsew")
         frame.grid_triple()         
 
+        # create login frame
         self.frames = {}     
         for page in ((Login,)):
             frame = page(self.container, self)
@@ -58,26 +59,29 @@ class App(ctk.CTk):
         #self.display_page(Dashboard)
         #self.display_page(list(self.frames)[0])
         
+        # setup database access
         self.accounts = Users(self.database)
         self.logs = Logs(self.database)
         self.printer_models = PrinterModels(self.database)
         self.printers = Printers(self.database)
         self.filaments = Filaments(self.database)
            
-        
-    def display_page(self, frame=None, index=None):
+    # display given page    
+    def display_page(self, frame=None):
         page = self.frames[frame]
         page.tkraise()                        
         
+    # initialise program
     def start(self): 
-        ctk.set_appearance_mode('dark')
-        self.after(1, lambda : self.state('zoomed'))
-        self.mainloop()
+        ctk.set_appearance_mode('dark') # force darkmode
+        self.after(1, lambda : self.state('zoomed')) # fullscreen window
+        self.mainloop() # start tkinter loop
         
+    # display dashboard if login is successful
     def login(self):
+        # validates user has access and their id is the correct length
         if self.access == True and len(self.current_user) == 6:
-
-            self.auth_level = self.accounts.fetch_auth(self.current_user)
+            self.auth_level = self.accounts.fetch_auth(self.current_user) # get and store user access level
             for page in ((Dashboard,)):
                 frame = page(self.container, self)
                 self.frames[page] = frame 
@@ -86,6 +90,7 @@ class App(ctk.CTk):
                 frame.columnconfigure(0, weight=1)
             self.display_page(Dashboard)
             
+    # resets access and user details, returns to login screen
     def logout(self):
         frame = Loading(self,self)
         frame.grid(row=0, column=0, sticky="nsew")

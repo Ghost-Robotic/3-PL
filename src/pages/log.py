@@ -1,6 +1,5 @@
 import customtkinter as ctk
 import src.style as style
-from src.helpers.CTkXYFrame.ctk_xyframe import CTkXYFrame 
 from .add import Add
 
 class Log(ctk.CTkFrame):
@@ -93,6 +92,7 @@ class Log(ctk.CTkFrame):
         
         
 #=================================================================================
+        # initialise add subpage
         self.add = Add(self.content_box, self.controller, self)
         self.add.grid(row=0, column=0, sticky="nsew")
         self.add.rowconfigure(0, weight=1)
@@ -113,7 +113,7 @@ class Log(ctk.CTkFrame):
     def grid_add(self):
         self.add.grid()
     
-    # hide subpage to ad log
+    # hide subpage to add log
     def remove_add(self):
         self.add.grid_remove()
     
@@ -122,7 +122,12 @@ class Log(ctk.CTkFrame):
         self.view_box.grid()
         #self.update_view()
         
+    # hide subpage to view logs
+    def remove_view(self):
+        self.view_box.grid_remove()        
+        
     def update_view(self):
+        """refresh view table"""
         self.table_frame.destroy()
         
         log_table = self.controller.logs.fetch_table()
@@ -150,11 +155,6 @@ class Log(ctk.CTkFrame):
                 column_counter += 1
             row_counter += 1
     
-    # hide subpage to view logs
-    def remove_view(self):
-        self.view_box.grid_remove()
-    
-        
     def validate_num(self, num):
         return num.isdigit() or num == ""
     

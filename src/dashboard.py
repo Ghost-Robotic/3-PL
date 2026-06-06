@@ -22,7 +22,7 @@ class Dashboard(ctk.CTkFrame):
         #                               fg_color="#00a2ff", hover_color="#0087d4")
         # logout_button.pack(side="top",anchor='e',padx=3,pady=3)
         
-        # navigation bar
+        # navigation bar with buttons for different tabs
         nav_container= ctk.CTkFrame(self, fg_color=style.dark_background, corner_radius=30, bg_color=style.dark_background)
         # nav_container.grid(row=0, column=0, padx=0, pady=(0,0))
         nav_container.pack(side="top", pady=(30,0))
@@ -66,7 +66,7 @@ class Dashboard(ctk.CTkFrame):
                                     fg_color=style.dark_background, hover_color=style.dark_foreground, corner_radius=0)
         self.account_button.pack(side='left', fill="y", expand=True)
         
-        # page
+        # container where each page will be displayed
         self.page_container = ctk.CTkFrame(self, fg_color=style.dark_background)
         self.page_container.pack(side="top", fill="both", expand=True)
         self.page_container.rowconfigure(0,weight=1)
@@ -85,12 +85,18 @@ class Dashboard(ctk.CTkFrame):
         #     frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)       
         #     frame.rowconfigure(0, weight=1)
         #     frame.columnconfigure(0, weight=1) 
-               
+        
+        # initialise home page       
         self.current_page="home"
         self.set_page("home") 
         self.home_button.configure(fg_color=style.dark_foreground)
         
     def page_constructor(self, page): 
+        """ initialise given page
+
+        Args:
+            page (class): tkinter frame
+        """
         frame = page(self.box,self.controller, self)
         self.pages[page] = frame
         frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)       
@@ -98,6 +104,7 @@ class Dashboard(ctk.CTkFrame):
         frame.columnconfigure(0, weight=1) 
         
     def loading_frame(self):
+        """loading animation when each page is first initialised"""
         frame = Loading(self.page_container,self.controller)
         frame.grid(row=0, column=0, sticky="nsew",padx=40,pady=(0,40))
         frame.grid_single()
@@ -110,6 +117,11 @@ class Dashboard(ctk.CTkFrame):
         self.controller.logout()
         
     def set_page(self, page):
+        """ display given page, initialise page if it does not exist
+
+        Args:
+            page (str): name of page
+        """
         match page:
             case "home":
                 try:
@@ -177,6 +189,11 @@ class Dashboard(ctk.CTkFrame):
                     self.current_page = "account"
                 
     def reset_tab(self, tab):
+        """ resets button colour of given page
+
+        Args:
+            tab (str): name of page
+        """
         match tab:
             case "home":
                 self.home_button.configure(fg_color=style.dark_background)

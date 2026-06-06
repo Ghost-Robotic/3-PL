@@ -367,6 +367,7 @@ class AccountPage(ctk.CTkFrame):
             var.set(0)
             
     def submit_form(self):
+        """add new account"""
         ids = self.controller.accounts.fetch_all_id()
         check = [len(self.id.get())==6,
                  self.fname.get()!="",
@@ -400,6 +401,7 @@ class AccountPage(ctk.CTkFrame):
         self.hide_error()
         
     def save_new_pass(self):
+        """change password"""
         matched_password, salt = self.controller.accounts.fetch_password(self.controller.current_user)
         # hashes given password
         hashed_password = hsh.hash(password=self.current_password.get(), salt=salt)
