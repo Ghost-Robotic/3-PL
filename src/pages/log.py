@@ -1,12 +1,12 @@
 import customtkinter as ctk
 import src.style as style
-import src.database as db
 from src.helpers.CTkXYFrame.ctk_xyframe import CTkXYFrame 
 from .add import Add
 
 class Log(ctk.CTkFrame):
     def __init__(self, parent, controller, parent_controller):
         self.controller = controller
+        self.parent_controller = parent_controller
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
         container.grid(row=0, column=0, sticky='nsew', padx=25, pady=(5,25))
@@ -50,7 +50,7 @@ class Log(ctk.CTkFrame):
         self.view_box.columnconfigure(0, weight=1)
         self.view_box.grid_remove()
     
-        log_table = db.logs.fetch_table()        
+        log_table = self.controller.logs.fetch_table()        
         
         header_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground, height=37,
                                               scrollbar_button_color=style.dark_foreground, scrollbar_button_hover_color=style.dark_foreground)
@@ -125,7 +125,7 @@ class Log(ctk.CTkFrame):
     def update_view(self):
         self.table_frame.destroy()
         
-        log_table = db.logs.fetch_table()
+        log_table = self.controller.logs.fetch_table()
         self.table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
         self.table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
         row_counter = 0

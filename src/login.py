@@ -3,7 +3,6 @@ from PIL import Image, ImageTk
 import src.style as style
 import random
 import src.helpers.hash_utils as hsh
-import database as db
 from src.helpers.loading import Loading
 # initial landing page where users are directed to login
 class Login(ctk.CTkFrame):
@@ -139,7 +138,7 @@ class Login(ctk.CTkFrame):
         if self.username.get() != "" and self.password.get() != "":
             try:
                 # gets corresponding hashed password and salt for given user_id
-                matched_password, salt = db.accounts.fetch_password(self.username.get())
+                matched_password, salt = self.controller.accounts.fetch_password(self.username.get())
                 # hashes given password
                 hashed_password = hsh.hash(password=self.password.get(), salt=salt)
                 # check if given password matches stored password
