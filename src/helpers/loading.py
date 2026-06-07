@@ -84,7 +84,7 @@ class Loading(ctk.CTkFrame):
         self.length = 800
         self.height = 70
         size = 200
-        self.speed = 60
+        self.speed = 3
         
         self.configure(fg_color=style.dark_foreground)
         self.container = ctk.CTkCanvas(self, width=self.length+size, height=size+self.height, bg=style.dark_foreground, borderwidth=0,highlightthickness=0)
@@ -108,7 +108,7 @@ class Loading(ctk.CTkFrame):
         """begin animation"""
         if self.linex < (self.length-0.01):      
             percentage = (self.linex)/self.length
-            change = self.speed  + ((5/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
+            change = self.speed  + ((20/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
             self.linex += change
             self.container.move(self.image_cont,change,0)
             self.canvas.coords(self.line,0,self.height/2,self.linex,self.height/2)
@@ -130,7 +130,7 @@ if __name__ == "__main__":
             frame.rowconfigure(0, weight=1)
             frame.columnconfigure(0, weight=1)
             #frame.grid_triple()
-            #frame.grid_single()
+            frame.grid_single()
             self.after(1, lambda : self.state('zoomed'))
             
     app = Test()
