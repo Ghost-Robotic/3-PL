@@ -1,12 +1,11 @@
 import customtkinter as ctk
 import src.style as style
-import database as db
-from src.helpers.CTkXYFrame.ctk_xyframe import CTkXYFrame 
 from .add import Add
 
 class Log(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, parent_controller):
         self.controller = controller
+        self.parent_controller = parent_controller
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
         container.grid(row=0, column=0, sticky='nsew', padx=25, pady=(5,25))
@@ -50,7 +49,7 @@ class Log(ctk.CTkFrame):
         self.view_box.columnconfigure(0, weight=1)
         self.view_box.grid_remove()
     
-        log_table = db.logs.fetch_table()        
+        log_table = self.controller.logs.fetch_table()        
         
         header_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground, height=37,
                                               scrollbar_button_color=style.dark_foreground, scrollbar_button_hover_color=style.dark_foreground)
@@ -93,6 +92,7 @@ class Log(ctk.CTkFrame):
         
         
 #=================================================================================
+        # initialise add subpage
         self.add = Add(self.content_box, self.controller, self)
         self.add.grid(row=0, column=0, sticky="nsew")
         self.add.rowconfigure(0, weight=1)
@@ -113,18 +113,24 @@ class Log(ctk.CTkFrame):
     def grid_add(self):
         self.add.grid()
     
-    # hide subpage to ad log
+    # hide subpage to add log
     def remove_add(self):
         self.add.grid_remove()
     
     # display subpage to view logs        
     def grid_view(self):
         self.view_box.grid()
+        #self.update_view()
+        
+    # hide subpage to view logs
+    def remove_view(self):
+        self.view_box.grid_remove()        
         
     def update_view(self):
+        """refresh view table"""
         self.table_frame.destroy()
         
-        log_table = db.logs.fetch_table()
+        log_table = self.controller.logs.fetch_table()
         self.table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
         self.table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
         row_counter = 0
@@ -149,11 +155,6 @@ class Log(ctk.CTkFrame):
                 column_counter += 1
             row_counter += 1
     
-    # hide subpage to view logs
-    def remove_view(self):
-        self.view_box.grid_remove()
-    
-        
     def validate_num(self, num):
         return num.isdigit() or num == ""
     

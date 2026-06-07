@@ -4,6 +4,7 @@ sys.path.append("../3_PL")
 import src.style as style
 
 def show_success(parent, controller):
+    """succesfully saved popup"""
     success_cont = ctk.CTkFrame(parent, border_width=3, border_color=style.main_green,corner_radius=10, width=400, height=100)
     success_cont.grid(row=0, column=0)
     success_cont.rowconfigure(0,weight=1)

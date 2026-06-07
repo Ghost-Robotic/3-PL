@@ -2,7 +2,6 @@ import customtkinter as ctk
 import src.style as style
 import shutil
 from PIL import Image, ImageTk
-import src.database as db
 import src.helpers.popup_utils as pop
 
 class Add(ctk.CTkFrame):
@@ -106,7 +105,7 @@ class Add(ctk.CTkFrame):
         
 #=====================================================================================================
         # set printer
-        self.print_dict = db.printer_models.fetch_name_brand()
+        self.print_dict = self.controller.printer_models.fetch_name_brand()
         self.printer_list = list(self.print_dict.keys())
         self.avail_printers = self.printer_list
         
@@ -127,7 +126,7 @@ class Add(ctk.CTkFrame):
 
 #=====================================================================================================
         # set filament
-        self.filament_dict = db.filaments.fetch_names()
+        self.filament_dict = self.controller.filaments.fetch_names()
         self.filament_list = list(self.filament_dict.keys())
         self.avail_filament = self.filament_list
         
@@ -155,7 +154,8 @@ class Add(ctk.CTkFrame):
         r_input_frame.rowconfigure(1, weight=1)
         
         # upload file button
-        self.plus = ImageTk.PhotoImage((Image.open("assets\plus.png")).resize((100,100), Image.LANCZOS))
+        #self.plus = ImageTk.PhotoImage((Image.open(r"assets\plus.png")).resize((100,100), Image.LANCZOS))
+        self.plus = ctk.CTkImage(dark_image=Image.open(r"assets\plus.png"),size=(100,100))
         self.add_file_button = ctk.CTkButton(r_input_frame, width=200, image=self.plus, height=200, anchor='center', corner_radius=18, text="",
                                     fg_color="#272727", border_color="white", border_width=3, hover_color=style.dark_foreground,
                                     command=(lambda : self.upload_file()))
@@ -183,7 +183,8 @@ class Add(ctk.CTkFrame):
         self.gcode_source = ctk.filedialog.askopenfilename(title="Select G-code file",filetypes=[("g-Code files","*.gcode")])
 
         if self.gcode_source != "":
-            grey_plus = ImageTk.PhotoImage((Image.open("assets\plusGrey.png")).resize((100,100), Image.LANCZOS))
+            #grey_plus = ImageTk.PhotoImage((Image.open("assets\plusGrey.png")).resize((100,100), Image.LANCZOS))
+            grey_plus = ctk.CTkImage(dark_image=Image.open(r"assets\plusGrey.png"),size=(100,100))
             self.add_file_button.configure(fg_color=style.dark_foreground, border_color="#a7a7a7", image=grey_plus)
             
             name = ""
@@ -200,6 +201,7 @@ class Add(ctk.CTkFrame):
             check = [self.print_name.get()!="",
                      self.file_name.get()!="",
                      self.file_name.get()!="*.gcode",
+                     self.file_name.get()[-6:]==".gcode",
                      (int(self.hours.get())*60 + int(self.mins.get())) !=0,
                      int(self.entry_weight.get())!=0,
                      self.printer_dropdown.get() in self.printer_list,
@@ -211,28 +213,29 @@ class Add(ctk.CTkFrame):
             
         
     def submit_form(self):
+        """add new print job to database"""
         if self.validate():
             try:
                 self.duration = int(self.hours.get())*60 + int(self.mins.get())
                 self.weight = int(self.entry_weight.get())
                 printer_id = self.print_dict.get(self.printer_dropdown.get())
                 filament_id = self.filament_dict.get(self.filament_dropdown.get())
-                db.logs.add_log(user_id=self.controller.current_user, print_name=self.print_name.get(), gcode=self.file_name.get(), 
+                self.controller.logs.add_log(user_id=self.controller.current_user, print_name=self.print_name.get(), gcode=self.file_name.get(), 
                             duration=self.duration, weight=self.weight, 
                             printer_id=printer_id, filament_id=filament_id)
                 
-                shutil.copy2(str(self.gcode_source), r"src\database\gcode")
-                self.reset_form()
+                shutil.copy2(str(self.gcode_source), r"database\gcode")
+                self.reset_form() 
                 pop.show_success(self, self.controller)
                 self.parent_controller.update_view()
-            except:
+            except Exception as e:
+                print(e)
                 self.show_error()            
         else:
             self.show_error()
         
         
     def reset_form(self):
-        self.show_error()
         strings = [self.print_name,self.printer_dropdown,self.filament_dropdown]
         integers = [self.hours,self.mins,self.slider_duration,self.entry_weight,self.slider_weight]
         
@@ -304,46 +307,47 @@ class Add(ctk.CTkFrame):
         dropdown.configure(values=current_list)
         
     def show_error(self):
-        self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
-        self.error_cont.grid(row=0, column=0)
-        self.error_cont.rowconfigure(0,weight=1)
-        self.error_cont.rowconfigure(1,weight=5)
-        self.error_cont.columnconfigure(0,weight=1)
-        
-        topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
-        topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
-        error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
-        error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
-        
-        close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
-                                     hover_color="red", fg_color="#242323",width=30,height=30,
-                                     command=(lambda : self.hide_error()))
-        close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
-        
-        error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
-        error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
-        error_frame.columnconfigure(0,weight=1)
-        
-        check = [self.print_name.get()!="",
-            (int(self.hours.get())*60 + int(self.mins.get())) !=0,
-            int(self.entry_weight.get())!=0,
-            self.printer_dropdown.get() in self.printer_list,
-            self.filament_dropdown.get() in self.filament_list]
-        
-        if not all(check):
-            error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))   
-        elif self.file_name.get()=="*.gcode":
-            error = ctk.CTkLabel(error_frame, text="no gcode file", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))   
-        else:
-            error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))
-        
-        okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
-                                     border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
-                                     command=(lambda : self.hide_error()))
-        okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
+        if len(self.winfo_children()) <= 1:
+            self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
+            self.error_cont.grid(row=0, column=0)
+            self.error_cont.rowconfigure(0,weight=1)
+            self.error_cont.rowconfigure(1,weight=5)
+            self.error_cont.columnconfigure(0,weight=1)
+            
+            topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
+            topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
+            error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
+            error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
+            
+            close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
+                                        hover_color="red", fg_color="#242323",width=30,height=30,
+                                        command=(lambda : self.hide_error()))
+            close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
+            
+            error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
+            error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
+            error_frame.columnconfigure(0,weight=1)
+            
+            check = [self.print_name.get()!="",
+                (int(self.hours.get())*60 + int(self.mins.get())) !=0,
+                int(self.entry_weight.get())!=0,
+                self.printer_dropdown.get() in self.printer_list,
+                self.filament_dropdown.get() in self.filament_list]
+            
+            if not all(check):
+                error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))   
+            elif self.file_name.get()=="*.gcode" or self.file_name.get()[-6:]!=".gcode":
+                error = ctk.CTkLabel(error_frame, text="no gcode file", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))   
+            else:
+                error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))
+            
+            okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
+                                        border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
+                                        command=(lambda : self.hide_error()))
+            okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
         
     def hide_error(self):
         try:

@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 import src.style as style
 import random
 import src.helpers.hash_utils as hsh
-import database as db
+from src.helpers.loading import Loading
 # initial landing page where users are directed to login
 class Login(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -25,7 +25,9 @@ class Login(ctk.CTkFrame):
         img_container.grid(row=0, column=0, sticky="nsew", rowspan=2)
         img_container.columnconfigure(0, weight=1)
         img_container.rowconfigure(0, weight=1)
-        img = ImageTk.PhotoImage((Image.open(self.random_img())).resize((700,700), Image.LANCZOS))
+        #img = ImageTk.PhotoImage((Image.open(self.random_img())).resize((700,700), Image.LANCZOS))
+        img = ctk.CTkImage(dark_image=Image.open(self.random_img()),size=(700,700))
+        
         self.img_label = ctk.CTkButton(img_container, image=img, command=self.change_img, text="", hover=False, fg_color=style.dark_background)
         self.img_label.grid(row=0, column=0)
         self.img_cycle = self.after(5000, self.change_img)
@@ -100,21 +102,26 @@ class Login(ctk.CTkFrame):
         
         
     def show_error(self):
+        """grid error label"""
         self.error_label.grid()
         
     def hide_error(self):
+        """hide error lavel"""
         self.error_label.grid_remove()
         
     def help(self):
+        """toggle help label"""
         if self.help_label.winfo_viewable():
             self.help_label.grid_remove()
         else:
             self.help_label.grid()
             
     def clear_username(self):
+        """clear username entry field"""
         self.username.delete(0, ctk.END)
         
     def clear_password(self):
+        """clear passoword entry field"""
         self.password.delete(0, ctk.END)
                        
     def random_img(self):
@@ -122,7 +129,8 @@ class Login(ctk.CTkFrame):
     
     def change_img(self):
         self.after_cancel(self.img_cycle)
-        img = ImageTk.PhotoImage((Image.open(self.random_img())).resize((700,700), Image.LANCZOS))
+        #img = ImageTk.PhotoImage((Image.open(self.random_img())).resize((700,700), Image.LANCZOS))
+        img = ctk.CTkImage(dark_image=Image.open(self.random_img()),size=(700,700))
         self.img_label.configure(image=img)
         self.img_cycle = self.after(5000, self.change_img)
         
@@ -132,26 +140,32 @@ class Login(ctk.CTkFrame):
         return id.isdigit() or id==""
         
     def submit(self):
+        """login if username and password are valid"""
         if self.username.get() != "" and self.password.get() != "":
             try:
                 # gets corresponding hashed password and salt for given user_id
-                matched_password, salt = db.accounts.fetch_password(self.username.get())
+                matched_password, salt = self.controller.accounts.fetch_password(self.username.get())
                 # hashes given password
                 hashed_password = hsh.hash(password=self.password.get(), salt=salt)
                 # check if given password matches stored password
                 if matched_password == hashed_password:
+                    frame = Loading(self.controller,self.controller)
+                    frame.grid(row=0, column=0, sticky="nsew")
+                    frame.grid_triple() 
+                    
                     self.controller.access = True
                     self.controller.current_user = self.username.get()
                     self.controller.login()
-                    #self.controller.display_page(list(self.controller.frames)[1])
                     print("match")
                     self.username.focus()
                     self.clear_username()
                     self.clear_password()
                     self.hide_error()
+                    
                 else:
                     raise Exception("Incorrect Password")
-            except:
+            except Exception as e:
+                print(e)
                 self.clear_password()
                 self.show_error()
         else:

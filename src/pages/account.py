@@ -1,11 +1,11 @@
 import customtkinter as ctk
 import src.style as style
-import src.database as db
 import src.helpers.hash_utils as hsh
 import src.helpers.popup_utils as pop
 class AccountPage(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, parent_controller):
         self.controller = controller
+        self.parent_controller = parent_controller
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
         container.grid(row=0, column=0, sticky='nsew', padx=25, pady=(5,25))
@@ -45,7 +45,7 @@ class AccountPage(ctk.CTkFrame):
 #=================================================================================
         # initialise profile subpage
         self.profile_box = ctk.CTkScrollableFrame(content_box,fg_color=style.dark_foreground)
-        self.profile_box.grid(row=0, column=0, sticky="nsew", ipadx=20, ipady=10, padx=30)
+        self.profile_box.grid(row=0, column=0, sticky="nsew", ipadx=20, ipady=10, padx=30,pady=(10,0))
         #self.profile_box.rowconfigure(0, weight=1)
         #self.profile_box.rowconfigure(1, weight=1)
         #self.profile_box.columnconfigure(0, weight=1)
@@ -56,7 +56,7 @@ class AccountPage(ctk.CTkFrame):
         logout_button.grid(row=0,column=0,sticky="ne", padx=80, pady=10)
         
         
-        name = (db.accounts.fetch_name(self.controller.current_user)).split()
+        name = (self.controller.accounts.fetch_name(self.controller.current_user)).split()
         
         current_id = ctk.StringVar(value=self.controller.current_user)
         current_fname = ctk.StringVar(value=name[0])
@@ -151,7 +151,7 @@ class AccountPage(ctk.CTkFrame):
         self.view_box.rowconfigure(1, weight=30)
         self.view_box.columnconfigure(0, weight=1)
         self.view_box.grid_remove()
-        users = db.accounts.fetch_table()
+        users = self.controller.accounts.fetch_table()
 
         header_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground, height=37,
                                               scrollbar_button_color=style.dark_foreground, scrollbar_button_hover_color=style.dark_foreground)
@@ -320,7 +320,7 @@ class AccountPage(ctk.CTkFrame):
     def update_view(self):
         self.table_frame.destroy()
         
-        users = db.accounts.fetch_table()
+        users = self.controller.accounts.fetch_table()
         self.table_frame = ctk.CTkScrollableFrame(self.view_box, fg_color=style.dark_foreground)
         self.table_frame.grid(row=1, column=0, sticky="nsew", padx=10,pady=0)
         row_counter = 0
@@ -367,7 +367,8 @@ class AccountPage(ctk.CTkFrame):
             var.set(0)
             
     def submit_form(self):
-        ids = db.accounts.fetch_all_id()
+        """add new account"""
+        ids = self.controller.accounts.fetch_all_id()
         check = [len(self.id.get())==6,
                  self.fname.get()!="",
                  self.lname.get()!="",
@@ -377,7 +378,7 @@ class AccountPage(ctk.CTkFrame):
         try:
             if all(check):
                 salt = hsh.generate_salt()
-                db.accounts.create_user(user_id=self.id.get(), f_name=self.fname.get(),l_name=self.lname.get(),access_level=self.auth_level.get(), 
+                self.controller.accounts.create_user(user_id=self.id.get(), f_name=self.fname.get(),l_name=self.lname.get(),access_level=self.auth_level.get(), 
                                         password=(hsh.hash(self.password.get(),salt)), salt=salt)
                 self.reset_form()
                 pop.show_success(self, self.controller)
@@ -400,14 +401,15 @@ class AccountPage(ctk.CTkFrame):
         self.hide_error()
         
     def save_new_pass(self):
-        matched_password, salt = db.accounts.fetch_password(self.controller.current_user)
+        """change password"""
+        matched_password, salt = self.controller.accounts.fetch_password(self.controller.current_user)
         # hashes given password
         hashed_password = hsh.hash(password=self.current_password.get(), salt=salt)
         if matched_password == hashed_password:
             if (self.new_pass.get() == self.new_pass2.get()) and self.new_pass.get()!="":
                 new_salt = hsh.generate_salt()
                 hashed_password = hsh.hash(password=self.new_pass.get(), salt=new_salt)
-                db.accounts.change_password(id=self.controller.current_user,password=hashed_password, salt=new_salt)
+                self.controller.accounts.change_password(id=self.controller.current_user,password=hashed_password, salt=new_salt)
                 self.reset_pass()
                 pop.show_success(self, self.controller)
                 self.update_view()
@@ -440,56 +442,57 @@ class AccountPage(ctk.CTkFrame):
             self.c_add_pass_entry.configure(border_color="red")
             
     def show_error(self, new_pass=0):
-        self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
-        self.error_cont.grid(row=0, column=0)
-        self.error_cont.rowconfigure(0,weight=1)
-        self.error_cont.rowconfigure(1,weight=5)
-        self.error_cont.columnconfigure(0,weight=1)
-        
-        topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
-        topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
-        error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
-        error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
-        
-        close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
-                                     hover_color="red", fg_color="#242323",width=30,height=30,
-                                     command=(lambda : self.hide_error()))
-        close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
-        
-        error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
-        error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
-        error_frame.columnconfigure(0,weight=1)
-        
+        if len(self.winfo_children()) <= 1:
+            self.error_cont = ctk.CTkFrame(self, border_width=3, border_color="red",corner_radius=10, width=400, height=100)
+            self.error_cont.grid(row=0, column=0)
+            self.error_cont.rowconfigure(0,weight=1)
+            self.error_cont.rowconfigure(1,weight=5)
+            self.error_cont.columnconfigure(0,weight=1)
+            
+            topbar = ctk.CTkFrame(self.error_cont, fg_color="#242323", corner_radius=10)
+            topbar.grid(row=0,column=0,sticky="new",padx=5,pady=5)
+            error_label = ctk.CTkLabel(topbar, text="ERROR: ", font=(style.normal_font,25,"bold"), text_color="red", width=370, anchor="w")
+            error_label.grid(row=0,column=0, padx=(10,0),pady=7, sticky="nw")
+            
+            close_button = ctk.CTkButton(topbar, text="X", font=(style.normal_font,20,"bold"), text_color="white",
+                                        hover_color="red", fg_color="#242323",width=30,height=30,
+                                        command=(lambda : self.hide_error()))
+            close_button.grid(row=0,column=1, sticky="se", padx=7,pady=7)
+            
+            error_frame = ctk.CTkFrame(self.error_cont, fg_color=style.dark_background, width=500, height=100)
+            error_frame.grid(row=1, column=0, sticky="nsew",padx=5,pady=5)
+            error_frame.columnconfigure(0,weight=1)
+            
 
-        check = [len(self.id.get())==6,
-                 self.fname.get()!="",
-                 self.lname.get()!=""]
+            check = [len(self.id.get())==6,
+                    self.fname.get()!="",
+                    self.lname.get()!=""]
+            
+            ids = self.controller.accounts.fetch_all_id()
         
-        ids = db.accounts.fetch_all_id()
-       
-        if new_pass == 1:
-            error = ctk.CTkLabel(error_frame, text="incorrect pasword", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))  
-        elif new_pass == 2:
-            error = ctk.CTkLabel(error_frame, text="passwords do not match", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))         
-        elif not all(check):
-            error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))   
-        elif self.id.get() in ids:
-            error = ctk.CTkLabel(error_frame, text="user already exists", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))   
-        elif self.password.get()!=self.confirm_password.get():
-            error = ctk.CTkLabel(error_frame, text="passwords do not match", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0)) 
-        else:
-            error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
-            error.grid(row=0,column=0, padx=(15,0))
-        
-        okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
-                                     border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
-                                     command=(lambda : self.hide_error()))
-        okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
+            if new_pass == 1:
+                error = ctk.CTkLabel(error_frame, text="incorrect pasword", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))  
+            elif new_pass == 2:
+                error = ctk.CTkLabel(error_frame, text="passwords do not match", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))         
+            elif not all(check):
+                error = ctk.CTkLabel(error_frame, text="all fields must be filled", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))   
+            elif self.id.get() in ids:
+                error = ctk.CTkLabel(error_frame, text="user already exists", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))   
+            elif self.password.get()!=self.confirm_password.get():
+                error = ctk.CTkLabel(error_frame, text="passwords do not match", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0)) 
+            else:
+                error = ctk.CTkLabel(error_frame, text="unable to save", font=(style.normal_font,20,"bold"), text_color="white")
+                error.grid(row=0,column=0, padx=(15,0))
+            
+            okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
+                                        border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
+                                        command=(lambda : self.hide_error()))
+            okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
         
     def hide_error(self):
         try:
