@@ -20,17 +20,21 @@ class Log(ctk.CTkFrame):
         
         options = []
         if self.controller.auth_level != None:
-            if self.controller.auth_level == 5:
+            if self.controller.auth_level >= 3:
                 options = [" Add "," View "]
-            else:
+            elif self.controller.auth_level >= 2:
                 options = [" Add "]
+            else:
+                options = [" No Access "]
         option_button = ctk.CTkSegmentedButton(topbar, width=200, values=options, 
-                                               font=(style.normal_font, 22), text_color="white",
-                                               selected_color=style.main_blue, selected_hover_color=style.hover_blue,
-                                               border_width=0, corner_radius=10,
-                                               command=self.switch_subpage)
-        option_button.grid(row=0,column=0, sticky="w",padx=25)
-        option_button.set(" Add ")
+                                            font=(style.normal_font, 22), text_color="white",
+                                            selected_color=style.main_blue, selected_hover_color=style.hover_blue,
+                                            border_width=0, corner_radius=10,
+                                            command=self.switch_subpage)
+        option_button.grid(row=0,column=0, sticky="w",padx=25)        
+        if " No Access " not in options:
+
+            option_button.set(" Add ")
         
         line = ctk.CTkFrame(topbar, height=5, fg_color="#585858")
         line.grid(row=1,column=0, sticky="we", padx=10, pady=(10,0))
@@ -93,11 +97,12 @@ class Log(ctk.CTkFrame):
         
 #=================================================================================
         # initialise add subpage
-        self.add = Add(self.content_box, self.controller, self)
-        self.add.grid(row=0, column=0, sticky="nsew")
-        self.add.rowconfigure(0, weight=1)
-        self.add.columnconfigure(0, weight=1)
-        self.grid_add()
+        if " No Access " not in options:
+            self.add = Add(self.content_box, self.controller, self)
+            self.add.grid(row=0, column=0, sticky="nsew")
+            self.add.rowconfigure(0, weight=1)
+            self.add.columnconfigure(0, weight=1)
+            self.grid_add()
 
 #=================================================================================
     def switch_subpage(self,page):

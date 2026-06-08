@@ -21,7 +21,7 @@ class FilamentPage(ctk.CTkFrame):
         
         options = []
         if self.controller.auth_level != None:
-            if self.controller.auth_level == 5:
+            if self.controller.auth_level >= 4:
                 options = [" View "," Add "]
             else:
                 options = [" View "]
