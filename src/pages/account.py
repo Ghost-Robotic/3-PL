@@ -42,10 +42,10 @@ class AccountPage(ctk.CTkFrame):
         
         name = list(self.controller.accounts.fetch_name(self.controller.current_user))
         
-        current_id = ctk.StringVar(value=self.controller.current_user)
-        current_fname = ctk.StringVar(value=name[0])
-        current_lname = ctk.StringVar(value=name[1])
-        current_auth_level = ctk.StringVar(value=self.controller.auth_level)
+        self.current_id = ctk.StringVar(value=self.controller.current_user)
+        self.current_fname = ctk.StringVar(value=name[0])
+        self.current_lname = ctk.StringVar(value=name[1])
+        self.current_auth_level = ctk.StringVar(value=self.controller.auth_level)
         
         self.current_password = ctk.StringVar()
         self.new_pass = ctk.StringVar()
@@ -58,7 +58,7 @@ class AccountPage(ctk.CTkFrame):
         id_frame.grid(row=1, column=0, sticky="w", padx=10, pady=10)
         id_label = ctk.CTkLabel(id_frame, text="Your ID:", font=(style.normal_font, 25, "bold"), text_color="white")
         id_label.grid(row=0, column=0, padx=(0,20))
-        id_entry = ctk.CTkLabel(id_frame, textvariable=current_id, width=100,
+        id_entry = ctk.CTkLabel(id_frame, textvariable=self.current_id, width=100,
                                    font=(style.normal_font, 22, "bold"), text_color="yellow", state="disabled",anchor="w")
         id_entry.grid(row=0, column=1)
         
@@ -66,12 +66,12 @@ class AccountPage(ctk.CTkFrame):
         username_frame.grid(row=2, column=0, sticky="w", padx=10, pady=10)
         fname_label = ctk.CTkLabel(username_frame, text="First Name:", font=(style.normal_font, 25, "bold"), text_color="white")
         fname_label.grid(row=0, column=0, padx=(0,20))
-        fname_entry = ctk.CTkLabel(username_frame, textvariable=current_fname,
+        fname_entry = ctk.CTkLabel(username_frame, textvariable=self.current_fname,
                                    font=(style.normal_font, 22, "bold"), text_color="yellow", state="disabled",anchor="w")
         fname_entry.grid(row=0, column=1)
         lname_label = ctk.CTkLabel(username_frame, text="Last Name:", font=(style.normal_font, 25, "bold"), text_color="white")
         lname_label.grid(row=0, column=2, padx=(40,20))
-        lname_entry = ctk.CTkLabel(username_frame, textvariable=current_lname, width=300,
+        lname_entry = ctk.CTkLabel(username_frame, textvariable=self.current_lname, width=300,
                                    font=(style.normal_font, 22, "bold"), text_color="yellow", state="disabled",anchor="w")
         lname_entry.grid(row=0, column=3)
         
@@ -79,7 +79,7 @@ class AccountPage(ctk.CTkFrame):
         auth_frame.grid(row=3, column=0, sticky="w", padx=10, pady=10)
         auth_label = ctk.CTkLabel(auth_frame, text="Authentication Level:", font=(style.normal_font, 25, "bold"), text_color="white")
         auth_label.grid(row=0, column=0, padx=(0,20))
-        auth_num = ctk.CTkLabel(auth_frame, textvariable=current_auth_level,font=(style.normal_font, 22, "bold"), text_color="yellow")
+        auth_num = ctk.CTkLabel(auth_frame, textvariable=self.current_auth_level,font=(style.normal_font, 22, "bold"), text_color="yellow")
         auth_num.grid(row=0,column=1)
         # auth_entry = ctk.CTkEntry(auth_frame, textvariable=auth_level, width=26,
         #                            font=(style.normal_font, 22), text_color="#f5f5f5", state="disabled")
@@ -285,47 +285,49 @@ class AccountPage(ctk.CTkFrame):
         edit_frame = ctk.CTkFrame(self.edit_box, fg_color=style.dark_foreground)
         edit_frame.grid(row=0,column=0, sticky="n")       
         
-        self.edit_name = ctk.StringVar()
-        self.edit_auth_level = ctk.IntVar(value=1)        
-
-        profile_title = ctk.CTkLabel(edit_frame, text="Edit Account:", font=(style.bold_font, 30), text_color=style.main_blue)
-        profile_title.grid(row=0, column=0, pady=20, sticky="w")
+        self.edit_id = ctk.StringVar()
+        self.edit_fname = ctk.StringVar()
+        self.edit_lname = ctk.StringVar()
+        self.edit_auth_level = ctk.IntVar(value=1)   
         
         self.all_accounts = list(self.controller.accounts.fetch_all_accounts())
-        self.all_id = {}
-        for row in self.all_accounts: self.all_id.update({row[0]:self.all_accounts.index(row)})
-        self.avail_id = list(self.all_id.keys())
-        self.all_name = {}
-        for row in self.all_accounts: self.all_name.update({row[1]:self.all_accounts.index(row)})
-        self.avail_name = list(self.all_name.keys())
-        
+        self.avail_accounts = self.all_accounts        
+
+        title_frame = ctk.CTkFrame(edit_frame, fg_color=style.dark_foreground)
+        title_frame.grid(row=0, column=0, pady=20, sticky="w")
+        profile_title = ctk.CTkLabel(title_frame, text="Edit Account:", font=(style.bold_font, 30), text_color=style.main_blue)
+        profile_title.grid(row=0, column=0, padx=(0,20))
+        self.account_dropdown = ctk.CTkComboBox(title_frame, values=self.avail_accounts,
+                                                 width=300,font=(style.normal_font, 22, "bold"), text_color="yellow",
+                                                 border_width=3, border_color=style.main_blue,
+                                                 button_color=style.main_blue, button_hover_color=style.hover_blue,
+                                                 command=(lambda account:self.select_account(account)))
+        self.account_dropdown.bind("<KeyRelease>", lambda e: 
+            self.on_dropdown_update(self.account_dropdown,self.all_accounts,self.avail_accounts))
+        self.account_dropdown.grid(row=0, column=1)
+        self.account_dropdown.set("")
+
         id_frame = ctk.CTkFrame(edit_frame,fg_color=style.dark_foreground)
         id_frame.grid(row=1, column=0, sticky="w", padx=20, pady=10)
         id_label = ctk.CTkLabel(id_frame, text="Your ID:", font=(style.normal_font, 25, "bold"), text_color="white")
         id_label.grid(row=0, column=0, padx=(0,20))
-        self.id_dropdown = ctk.CTkComboBox(id_frame, values=self.avail_id,
-                                                 width=130,font=(style.normal_font, 22, "bold"), text_color="yellow",
-                                                 border_width=2, border_color=style.main_blue,
-                                                 button_color=style.main_blue, button_hover_color=style.hover_blue,
-                                                 command=(lambda id:self.select_id(id)))
-        self.id_dropdown.bind("<KeyRelease>", lambda e: 
-            self.on_dropdown_update(self.id_dropdown,list(self.all_id.keys()),self.avail_id))
-        self.id_dropdown.grid(row=0, column=1)
-        self.id_dropdown.set("")
+        id_entry = ctk.CTkEntry(id_frame, textvariable=self.edit_id, width=100,
+                                   font=(style.normal_font, 22, "bold"), text_color="yellow", border_width=2, border_color=style.main_blue,
+                                   validate="key", validatecommand=(val_id, "%P"), state="disabled")
+        id_entry.grid(row=0, column=1)
         
         username_frame = ctk.CTkFrame(edit_frame,fg_color=style.dark_foreground)
         username_frame.grid(row=2, column=0, sticky="w", padx=20, pady=10)
-        name_label = ctk.CTkLabel(username_frame, text="First Name:", font=(style.normal_font, 25, "bold"), text_color="white")
-        name_label.grid(row=0, column=0, padx=(0,20))
-        self.name_dropdown = ctk.CTkComboBox(username_frame, values=self.avail_name, variable=self.edit_name,
-                                                 width=300,font=(style.normal_font, 22, "bold"), text_color="yellow",
-                                                 border_width=2, border_color=style.main_blue,
-                                                 button_color=style.main_blue, button_hover_color=style.hover_blue,
-                                                 command=(lambda name:self.select_name(name)))
-        self.name_dropdown.bind("<KeyRelease>", lambda e: 
-            self.on_dropdown_update(self.name_dropdown,list(self.all_name.keys()),self.avail_name))
-        self.name_dropdown.grid(row=0, column=1)
-        self.name_dropdown.set("")
+        fname_label = ctk.CTkLabel(username_frame, text="First Name:", font=(style.normal_font, 25, "bold"), text_color="white")
+        fname_label.grid(row=0, column=0, padx=(0,20))
+        fname_entry = ctk.CTkEntry(username_frame, textvariable=self.edit_fname, width=300,
+                                   font=(style.normal_font, 22, "bold"), text_color="#f5f5f5", border_width=2, border_color=style.main_blue)
+        fname_entry.grid(row=0, column=1)
+        lname_label = ctk.CTkLabel(username_frame, text="Last Name:", font=(style.normal_font, 25, "bold"), text_color="white")
+        lname_label.grid(row=0, column=2, padx=(40,20))
+        lname_entry = ctk.CTkEntry(username_frame, textvariable=self.edit_lname, width=300,
+                                   font=(style.normal_font, 22, "bold"), text_color="#f5f5f5", border_width=2, border_color=style.main_blue)
+        lname_entry.grid(row=0, column=3)
         
         auth_frame = ctk.CTkFrame(edit_frame,fg_color=style.dark_foreground)
         auth_frame.grid(row=3, column=0, sticky="w", padx=20, pady=10)
@@ -410,6 +412,12 @@ class AccountPage(ctk.CTkFrame):
         self.view_box.grid()
         
     def update_view(self):
+        name = list(self.controller.accounts.fetch_name(self.controller.current_user))
+        self.current_id.set(value=self.controller.current_user)
+        self.current_fname.set(value=name[0])
+        self.current_lname.set(value=name[1])
+        self.current_auth_level.set(value=self.controller.auth_level)
+        
         self.table_frame.destroy()
         
         users = self.controller.accounts.fetch_table()
@@ -542,14 +550,15 @@ class AccountPage(ctk.CTkFrame):
             self.c_add_pass_entry.configure(border_color="red")
             
     def submit_edit(self):
-        f_name, l_name = self.edit_name.get().split(" ", maxsplit=1)
-        check = [len(self.id_dropdown.get())==6,
-                 f_name.strip() != "",
-                 l_name.strip() != ""]
         try:
+            check = [len(self.edit_id.get().strip())==6,
+                    self.edit_fname.get().strip() != "",
+                    self.edit_lname.get().strip() != ""]
+            
             if all(check):
-                self.controller.accounts.edit_user(user_id=self.id_dropdown.get(),f_name=f_name,l_name=l_name,access_level=self.edit_auth_level.get())
+                self.controller.accounts.edit_user(user_id=self.edit_id.get().strip(),f_name=self.edit_fname.get().strip(),l_name=self.edit_lname.get().strip(),access_level=self.edit_auth_level.get())
                 pop.show_success(self, self.controller)
+                self.all_accounts = list(self.controller.accounts.fetch_all_accounts())
                 self.reset_edit()
                 self.update_view()
             else:
@@ -559,14 +568,15 @@ class AccountPage(ctk.CTkFrame):
             self.show_error
     
     def reset_edit(self):
-        self.id_dropdown.set("")
-        self.name_dropdown.set("")
+        self.edit_id.set("")
+        self.edit_fname.set("")
+        self.edit_lname.set("")
         self.edit_auth_level.set(1)
-        self.id_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
-        self.name_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
         
-        self.avail_id = list(self.all_id.keys())
-        self.avail_name = list(self.all_name.keys())
+        self.avail_account = self.all_accounts
+        self.account_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue, values=self.avail_account)
+        self.account_dropdown.set("")
+        
             
     def show_error(self, new_pass=0):
         if len(self.winfo_children()) <= 1:
@@ -646,17 +656,13 @@ class AccountPage(ctk.CTkFrame):
     
         dropdown.configure(values=current_list)
         
-    def select_id(self, id):
-        self.id_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
-        self.name_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
-        index = self.all_id.get(id)
-        self.edit_name.set(self.all_accounts[index][1])
-        self.edit_auth_level.set(self.controller.accounts.fetch_auth(id))
         
-    def select_name(self, name):
-        self.id_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
-        self.name_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
-        index = self.all_name.get(name)
-        id = self.all_accounts[index][0]
-        self.id_dropdown.set(id)
+    def select_account(self, account:str):
+        self.account_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
+        
+        id, fname, lname = account.split(" ", maxsplit=3)
+        
+        self.edit_id.set(id)
+        self.edit_fname.set(fname)
+        self.edit_lname.set(lname)
         self.edit_auth_level.set(self.controller.accounts.fetch_auth(id))

@@ -98,7 +98,7 @@ class Users():
     def fetch_all_accounts(self):
         account = []
         for row in self.cursor.execute('SELECT user_id, f_name, l_name FROM users'):
-            account.append([row[0],f"{row[1].title()} {row[2].title()}"])
+            account.append(f"{row[0]} {row[1].title()} {row[2].title()}")
         return account
     
     def edit_user(self, user_id, f_name, l_name, access_level):
