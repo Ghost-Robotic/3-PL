@@ -9,7 +9,7 @@ class Loading(ctk.CTkFrame):
     """loading animations frame"""
     def __init__(self, parent, controller):
         self.controller = controller
-        ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background)
+        ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background,corner_radius=30)
         self.rowconfigure(0,weight=1)
         self.columnconfigure(0,weight=1)
 
