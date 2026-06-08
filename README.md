@@ -1,7 +1,7 @@
 # 3-PL (3D Printer Log)
 3-PL is a python customTkinter application designed for organisations such as universities/schools to track and monitor usage of 3D printers. This application functions as a digital logbook where users enter information about their print job every time they use a 3D printer. The application can also store information about the printers and filament materials available for use that can be selected from when making a log entry. This thus gives organisations greater traceability and accountability over the use of their 3D printers
 
-3-PL features secure login access with all passwords stored as a hashed string, preventing attackers from passwords. 3-PL also contains an authorisation system, allowing administrators to choose the level of access that users are given. Access levels and authorised actions are detailed below:
+3-PL features secure login access with all passwords stored as a hashed string, preventing attackers from viewing passwords even if they are stolen. 3-PL also contains an authorisation system, allowing administrators to choose the level of access that users are given. Access levels and authorised actions are detailed below:
 
 |Access Level|Authorised Actions|
 | --- | --- |
