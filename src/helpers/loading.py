@@ -9,7 +9,7 @@ class Loading(ctk.CTkFrame):
     """loading animations frame"""
     def __init__(self, parent, controller):
         self.controller = controller
-        ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background)
+        ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background,corner_radius=30)
         self.rowconfigure(0,weight=1)
         self.columnconfigure(0,weight=1)
 
@@ -22,8 +22,9 @@ class Loading(ctk.CTkFrame):
         self.canvas = ctk.CTkCanvas(self.container, bg=style.dark_background, width=400,height=400, borderwidth=0,highlightthickness=0)
         self.container.create_window(400,800, window=self.canvas,anchor="s")  
         
-        self.speed = 10
+        self.speed = 3
         self.distance = 400
+        self.factor = 50
         
         self.line_1_x = 0
         self.line_2_x = self.distance
@@ -36,7 +37,7 @@ class Loading(ctk.CTkFrame):
         self.img_canvas = ctk.CTkCanvas(self.container, bg=style.dark_background, width=400,height=400, borderwidth=0,highlightthickness=0)
         self.image_cont =self.container.create_window(200,700, window=self.img_canvas,anchor="s") 
         
-        self.img = ImageTk.PhotoImage((Image.open(r"assets\toolhead-transp.png")).resize((400,400), Image.LANCZOS))
+        self.img = ImageTk.PhotoImage((Image.open(r"assets/toolhead-transp.png")).resize((400,400), Image.LANCZOS))
         self.img_canvas.create_image(200,400, image=self.img, anchor="s")
         self.canvas.itemconfig(self.line3, capstyle="round")
         self.increase_triple()
@@ -46,7 +47,7 @@ class Loading(ctk.CTkFrame):
         if self.line_3_x < 399.99:      
             percentage = (self.line_3_x)/self.distance
             #print(f"{step} , {percentage} , {self.line_3_x}")
-            change = self.speed  + ((5/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
+            change = self.speed  + ((self.factor/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
             self.line_3_x += change
             # print((5/2) * (math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
             self.container.move(self.image_cont,change,0)
@@ -58,7 +59,7 @@ class Loading(ctk.CTkFrame):
             self.canvas.itemconfig(self.line2,capstyle="round") 
             percentage = (self.line_2_x)/self.distance
             #print(f"{percentage} , {self.line_2_x}")
-            change = -self.speed  - ((5/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
+            change = -self.speed  - ((self.factor/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
             self.line_2_x += change
             self.container.coords(self.image_cont,200+self.line_2_x,550)
             self.canvas.coords(self.line2,400,200,self.line_2_x,200)
@@ -69,7 +70,7 @@ class Loading(ctk.CTkFrame):
             self.canvas.itemconfig(self.line1,capstyle="round") 
             percentage = (self.line_1_x)/self.distance
             #print(f"{percentage} , {self.line_1_x}")
-            change = self.speed  + ((5/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
+            change = self.speed  + ((self.factor/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
             self.line_1_x += change
             self.container.coords(self.image_cont,200+self.line_1_x,400)
             self.canvas.coords(self.line1,0,50,self.line_1_x,50)
@@ -84,7 +85,8 @@ class Loading(ctk.CTkFrame):
         self.length = 800
         self.height = 70
         size = 200
-        self.speed = 3
+        self.speed = 1.5
+        self.factor = 180
         
         self.configure(fg_color=style.dark_foreground)
         self.container = ctk.CTkCanvas(self, width=self.length+size, height=size+self.height, bg=style.dark_foreground, borderwidth=0,highlightthickness=0)
@@ -99,7 +101,7 @@ class Loading(ctk.CTkFrame):
         self.img_canvas = ctk.CTkCanvas(self.container, bg=style.dark_foreground, width=size,height=size, borderwidth=0,highlightthickness=0)
         self.image_cont =self.container.create_window(size/2,size, window=self.img_canvas,anchor="s") 
         
-        self.img = ImageTk.PhotoImage((Image.open(r"assets\toolhead-transp.png")).resize((size,size), Image.LANCZOS))
+        self.img = ImageTk.PhotoImage((Image.open(r"assets/toolhead-transp.png")).resize((size,size), Image.LANCZOS))
         self.img_canvas.create_image(size/2,size, image=self.img, anchor="s")
         
         self.increase_single()
@@ -108,7 +110,7 @@ class Loading(ctk.CTkFrame):
         """begin animation"""
         if self.linex < (self.length-0.01):      
             percentage = (self.linex)/self.length
-            change = self.speed  + ((20/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
+            change = self.speed  + ((self.factor/2)*(math.sin((2*math.pi*percentage) - (math.pi/2)) + 1))
             self.linex += change
             self.container.move(self.image_cont,change,0)
             self.canvas.coords(self.line,0,self.height/2,self.linex,self.height/2)
@@ -129,8 +131,8 @@ if __name__ == "__main__":
             frame.grid(row=0, column=0, sticky="nsew")       
             frame.rowconfigure(0, weight=1)
             frame.columnconfigure(0, weight=1)
-            #frame.grid_triple()
-            frame.grid_single()
+            frame.grid_triple()
+            #frame.grid_single()
             self.after(1, lambda : self.state('zoomed'))
             
     app = Test()

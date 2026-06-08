@@ -28,8 +28,8 @@ class Dashboard(ctk.CTkFrame):
         nav_container.pack(side="top", pady=(30,0))
         
         #===========================================
-        #logo = ImageTk.PhotoImage((Image.open("assets\\3-PL-700x400.png")).resize((140,80), Image.LANCZOS))
-        logo = ctk.CTkImage(dark_image=Image.open("assets\\3-PL-700x400.png"),size=(140,80))
+        #logo = ImageTk.PhotoImage((Image.open("assets/3-PL-700x400.png")).resize((140,80), Image.LANCZOS))
+        logo = ctk.CTkImage(dark_image=Image.open("assets/3-PL-700x400.png"),size=(140,80))
         logo_button = ctk.CTkButton(nav_container, command=(lambda : self.set_page("home")), 
                                     image=logo, anchor="center", text="", 
                                     corner_radius=0, fg_color=style.dark_background,
@@ -122,6 +122,7 @@ class Dashboard(ctk.CTkFrame):
         Args:
             page (str): name of page
         """
+        #self.loading_frame()
         match page:
             case "home":
                 try:
@@ -211,7 +212,7 @@ class Dashboard(ctk.CTkFrame):
 if __name__ == "__main__":
     class Test(ctk.CTk):
         def __init__(self, *args, **kwargs):
-            self.database = r"database\log.db"
+            self.database = r"database/log.db"
             self.access = True
             self.current_user = 123456
             self.auth_level = 5
