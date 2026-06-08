@@ -14,14 +14,17 @@ filaments = Filaments(r"database/log.db")
 # setup sample database
 salt = hsh.generate_salt()
 accounts.create_user(user_id=123456, password=hsh.hash("admin", salt), salt=salt,f_name="john", l_name="doe", access_level=5)
-accounts.create_user(user_id=654321, password=hsh.hash("password", salt), salt=salt,f_name="bob", l_name="builder", access_level=1)
 accounts.create_user(user_id=987654, password=hsh.hash("123456", salt), salt=salt,f_name="thomas", l_name="smith", access_level=4)
+accounts.create_user(user_id=246246, password=hsh.hash("password123", salt), salt=salt,f_name="amelia", l_name="smith", access_level=3)
+accounts.create_user(user_id=135135, password=hsh.hash("qwerty", salt), salt=salt,f_name="olivia", l_name="doe", access_level=2)
+accounts.create_user(user_id=654321, password=hsh.hash("password", salt), salt=salt,f_name="bob", l_name="builder", access_level=1)
+
 accounts.view_table()
 
 filament_types = ["PLA", "PETG", "ABS", "ASA", "TPU-95A","TPU-90A","TPU-85A", "PCCF", "PC", "PEEK", "PLA-CF", "PETG-CF", "PCTG", "ABS-CF", "PPS-CF", "PPA-CF", "PET-CF", "Nylon", "Nylon-GF", "PETG-GF","PC-GF","ABS-GF", "HTPLA","PLA Silk", "Brass filled HTPLA", "Iron filled PLA", "Bronze filled PLA", "Static Dissipative PLA", "Matte PLA", "PLA+", "Matte PETG","PA12CF","PA6CF","Wood PLA", "Marble PLA"]
 
 for i in filament_types:
-    filaments.add_filament(material=i)
+    filaments.add_filament(material=i, amount=random.randint(0,10))
 filaments.view_table()
 
 printer_types = [("CORE One L","Prusa",False),("CORE One","Prusa",False),("XL 5 Tool","Prusa",True),("HT90","Prusa",False),("H2D","Bambu Lab",True),("P1S","Bambu Lab",False),("U1","Snapmaker",True),("Omni TECH+","Omni3D",False),("FUSE 1+","formlabs",False),("Form 4L","formlabs",False)]
