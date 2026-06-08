@@ -245,11 +245,11 @@ class Add(ctk.CTkFrame):
         for integer in integers:
             integer.set(0)
         
-        self.printer_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
-        self.filament_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue)
-        
         self.avail_printers = self.printer_list
-        self.avail_filament = self.filament_list
+        self.avail_filament = self.filament_list        
+        
+        self.printer_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue, values = self.avail_printers)
+        self.filament_dropdown.configure(border_color=style.main_blue, button_color=style.main_blue, values=self.avail_filament)
         
         self.file_name.set("*.gcode")
         self.add_file_button.configure(image=self.plus,border_color="white")
