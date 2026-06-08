@@ -11,7 +11,7 @@ class Login(ctk.CTkFrame):
         #controller.bind("<Configure>", controller.on_resize)
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_background) 
         self.images = ["assets/c-1L-dark2.png", "assets/c1-indx.png", "assets/h2d.png", "assets/ht90-dark.png", 
-                       "assets/P1S.png", "assets/xl.png", "assets/xl2.png", "assets/xl5-transp.png",r"assets\f4l.png",r"assets\fuse.png"]
+                       "assets/P1S.png", "assets/xl.png", "assets/xl2.png", "assets/xl5-transp.png",r"assets/f4l.png",r"assets/fuse.png"]
                 
             
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)

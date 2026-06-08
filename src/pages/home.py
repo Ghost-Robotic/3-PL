@@ -6,8 +6,8 @@ from PIL import Image
 class Home(ctk.CTkFrame):
     def __init__(self, parent, controller, parent_controller):
         self.controller = controller
-        self.model_imgs = [r"assets\modelpics\plate_1.png", r"assets\modelpics\plate_2.png", r"assets\modelpics\plate_3.png", r"assets\modelpics\plate_4.png", 
-                          r"assets\modelpics\plate_5.png", r"assets\modelpics\plate_6.png", r"assets\modelpics\plate_7.png", ]
+        self.model_imgs = [r"assets/modelpics/plate_1.png", r"assets/modelpics/plate_2.png", r"assets/modelpics/plate_3.png", r"assets/modelpics/plate_4.png", 
+                          r"assets/modelpics/plate_5.png", r"assets/modelpics/plate_6.png", r"assets/modelpics/plate_7.png", ]
         ctk.CTkFrame.__init__(self, parent, fg_color=style.dark_foreground)
         container = ctk.CTkFrame(self, fg_color=style.dark_foreground)
         container.grid(row=0, column=0, sticky='nsew', padx=25, pady=(5,25))
@@ -34,7 +34,7 @@ class Home(ctk.CTkFrame):
         
         self.nav_buttons_cont = ctk.CTkFrame(container, fg_color=style.dark_foreground)
         self.nav_buttons_cont.grid(row=0,column=0,sticky="w",padx=(10,0))
-        image = ctk.CTkImage(dark_image=Image.open(r"assets\toolhead-transp.png"),size=(120,120))
+        image = ctk.CTkImage(dark_image=Image.open(r"assets/toolhead-transp.png"),size=(120,120))
         image_box = ctk.CTkButton(self.nav_buttons_cont, image=image,fg_color=style.dark_foreground,state="disabled",text="")
         image_box.pack(side="top",padx=(120,0))
         

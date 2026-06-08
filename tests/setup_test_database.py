@@ -5,11 +5,11 @@ from src.database import Users, Logs, PrinterModels, Printers, Filaments
 import random
 import src.helpers.hash_utils as hsh
 
-accounts = Users(r"database\log.db")
-logs = Logs(r"database\log.db")
-printer_models = PrinterModels(r"database\log.db")
-printers = Printers(r"database\log.db")
-filaments = Filaments(r"database\log.db")
+accounts = Users(r"database/log.db")
+logs = Logs(r"database/log.db")
+printer_models = PrinterModels(r"database/log.db")
+printers = Printers(r"database/log.db")
+filaments = Filaments(r"database/log.db")
 
 # setup sample database
 salt = hsh.generate_salt()

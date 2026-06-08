@@ -154,8 +154,8 @@ class Add(ctk.CTkFrame):
         r_input_frame.rowconfigure(1, weight=1)
         
         # upload file button
-        #self.plus = ImageTk.PhotoImage((Image.open(r"assets\plus.png")).resize((100,100), Image.LANCZOS))
-        self.plus = ctk.CTkImage(dark_image=Image.open(r"assets\plus.png"),size=(100,100))
+        #self.plus = ImageTk.PhotoImage((Image.open(r"assets/plus.png")).resize((100,100), Image.LANCZOS))
+        self.plus = ctk.CTkImage(dark_image=Image.open(r"assets/plus.png"),size=(100,100))
         self.add_file_button = ctk.CTkButton(r_input_frame, width=200, image=self.plus, height=200, anchor='center', corner_radius=18, text="",
                                     fg_color="#272727", border_color="white", border_width=3, hover_color=style.dark_foreground,
                                     command=(lambda : self.upload_file()))
@@ -183,8 +183,8 @@ class Add(ctk.CTkFrame):
         self.gcode_source = ctk.filedialog.askopenfilename(title="Select G-code file",filetypes=[("g-Code files","*.gcode")])
 
         if self.gcode_source != "":
-            #grey_plus = ImageTk.PhotoImage((Image.open("assets\plusGrey.png")).resize((100,100), Image.LANCZOS))
-            grey_plus = ctk.CTkImage(dark_image=Image.open(r"assets\plusGrey.png"),size=(100,100))
+            #grey_plus = ImageTk.PhotoImage((Image.open("assets/plusGrey.png")).resize((100,100), Image.LANCZOS))
+            grey_plus = ctk.CTkImage(dark_image=Image.open(r"assets/plusGrey.png"),size=(100,100))
             self.add_file_button.configure(fg_color=style.dark_foreground, border_color="#a7a7a7", image=grey_plus)
             
             name = ""
@@ -224,7 +224,7 @@ class Add(ctk.CTkFrame):
                             duration=self.duration, weight=self.weight, 
                             printer_id=printer_id, filament_id=filament_id)
                 
-                shutil.copy2(str(self.gcode_source), r"database\gcode")
+                shutil.copy2(str(self.gcode_source), r"database/gcode")
                 self.reset_form() 
                 pop.show_success(self, self.controller)
                 self.parent_controller.update_view()

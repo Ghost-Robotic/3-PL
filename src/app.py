@@ -18,7 +18,7 @@ def resource_path(relative_path):
 
 class App(ctk.CTk):
     def __init__(self, *args, **kwargs):
-        self.database = r"database\log.db"
+        self.database = r"database/log.db"
         
         self.access = False
         self.current_user = None
@@ -27,10 +27,12 @@ class App(ctk.CTk):
         #self.bind("<Configure>", self.on_resize)
         # configure window
         self.title("3-PL")
-        # logo = Image.open(r"assets\v2logo.png")
+        # logo = Image.open(r"assets/v2logo.png")
         # icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64)]
         # logo.save('v2logo.ico', format='ICO', sizes=icon_sizes)
-        self.iconbitmap(r"assets\v2logo.ico")
+        self.iconbitmap(r"assets/v2logo.ico")
+        icon = ImageTk.PhotoImage((Image.open(r"assets/v2logo.png")))
+        self.iconphoto(True,icon)
         #system(self.after(1, self.wm_state ,('zoomed')) if name == 'nt' else self.attributes('-zoomed', True))
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=1)

@@ -9,7 +9,7 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-database = resource_path(r"database\log.db")
+database = resource_path(r"database/log.db")
     
 class Users():
     def __init__(self, database):
