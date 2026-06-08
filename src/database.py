@@ -75,8 +75,7 @@ class Users():
                                      WHERE user_id =?''',(user_id,))
         
         row = result.fetchone()
-        name = row[0][0].upper()+row[0][1:]+ " " + row[1][0].upper()+row[1][1:]
-        return name.title()
+        return row[0].title(), row[1].title() # fname,lname
     
     def fetch_table(self):
         rows = []
@@ -95,6 +94,15 @@ class Users():
         for row in self.cursor.execute('SELECT user_id FROM users'):
             id.append(row[0])
         return id
+    
+    def fetch_all_accounts(self):
+        account = []
+        for row in self.cursor.execute('SELECT user_id, f_name, l_name FROM users'):
+            account.append([row[0],f"{row[1].title()} {row[2].title()}"])
+        return account
+    
+    def edit_user(self, user_id, f_name, l_name, access_level):
+        self.cursor.execute('UPDATE users SET f_name=?, l_name=?, access_level=? WHERE user_id=?', (f_name,l_name,access_level,user_id))
         
 class Groups():
     def __init__(self, database):
@@ -175,6 +183,9 @@ class PrinterModels:
         name = result[0] +" "+ result[1]
         return name
     
+    def edit_model(self):
+        pass
+    
 
 class Printers:
     def __init__(self, database):
@@ -240,6 +251,9 @@ class Filaments:
         result = row.fetchone()
         name = result[0]
         return name
+    
+    def edit_filament(self):
+        pass
 
 class Logs:
     def __init__(self, database):
@@ -301,8 +315,11 @@ class Logs:
             columns = []
             columns.append(str(row[0]))
             
-            name = str(row[1]) + " " + str(row[2])
-            columns.append(name)
+            fname = str(row[1])
+            lname = str(row[2])
+            
+            name = f"{fname} {lname}"
+            columns.append(name.title())
             
             columns.append(row[3])
 
