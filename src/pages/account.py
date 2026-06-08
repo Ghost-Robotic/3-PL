@@ -309,10 +309,10 @@ class AccountPage(ctk.CTkFrame):
 
         id_frame = ctk.CTkFrame(edit_frame,fg_color=style.dark_foreground)
         id_frame.grid(row=1, column=0, sticky="w", padx=20, pady=10)
-        id_label = ctk.CTkLabel(id_frame, text="Your ID:", font=(style.normal_font, 25, "bold"), text_color="white")
+        id_label = ctk.CTkLabel(id_frame, text="ID:", font=(style.normal_font, 25, "bold"), text_color="white")
         id_label.grid(row=0, column=0, padx=(0,20))
         id_entry = ctk.CTkEntry(id_frame, textvariable=self.edit_id, width=100,
-                                   font=(style.normal_font, 22, "bold"), text_color="yellow", border_width=2, border_color=style.main_blue,
+                                   font=(style.normal_font, 22, "bold"), text_color="yellow", border_width=0, border_color=style.main_blue, fg_color=style.dark_foreground,
                                    validate="key", validatecommand=(val_id, "%P"), state="disabled")
         id_entry.grid(row=0, column=1)
         
