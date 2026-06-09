@@ -563,10 +563,10 @@ class AccountPage(ctk.CTkFrame):
                 self.reset_edit()
                 self.update_view()
             else:
-                pop.show_error("all fields must be filled")
+                pop.show_error(parent=self,message="all fields must be filled")
         except Exception as e:
             print(e)
-            pop.show_error("unable to save")
+            pop.show_error(parent=self,message="unable to save")
     
     def reset_edit(self):
         self.edit_id.set("")

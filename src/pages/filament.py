@@ -166,8 +166,8 @@ class FilamentPage(ctk.CTkFrame):
         
         self.edit_id = ctk.StringVar()
         self.edit_material_name = ctk.StringVar()
-        self.edit_weight = ctk.StringVar(value="0")
-        self.edit_amount = ctk.StringVar(value="0")
+        self.edit_weight = ctk.StringVar()
+        self.edit_amount = ctk.StringVar()
         val_num = self.register(self.validate_num)
         
         edit_frame = ctk.CTkFrame(self.edit_box, fg_color=style.dark_foreground)
@@ -366,10 +366,10 @@ class FilamentPage(ctk.CTkFrame):
                 self.reset_edit()
                 self.update_view()
             else:
-                pop.show_error("all fields must be filled")
+                pop.show_error(self,"all fields must be filled")
         except Exception as e:
             print(e)
-            pop.show_error("unable to save")
+            pop.show_error(self,"unable to save")
     
     def reset_edit(self):
         """reset edit form fields"""

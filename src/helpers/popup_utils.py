@@ -64,7 +64,7 @@ def show_error(parent, message=""):
         
         okay_button = ctk.CTkButton(error_frame, text="Okay", font=(style.normal_font,22,"bold"),
                                     border_color=style.main_blue, border_width=2,hover_color=style.main_blue, fg_color=style.dark_background,width=50,
-                                    command=(lambda : self.hide_error()))
+                                    command=(lambda : hide_error(error_cont)))
         okay_button.grid(row=1,column=1, sticky="se", padx=10,pady=10)
     
 def hide_error(frame):
