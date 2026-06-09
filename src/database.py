@@ -272,6 +272,30 @@ class Filaments:
     
     def edit_filament(self, filament_id, material, weight, amount):
         self.cursor.execute('UPDATE filaments SET material=?, weight=?, amount=? WHERE filament_id=?', (material,weight,amount,filament_id))
+        
+class PrinterFilaments:
+    def __init__(self, database):
+        self.connection =sql.connect(database, autocommit=True)
+        self.connection.execute('PRAGMA foreign_keys = ON')
+        self.cursor = self.connection.cursor()
+        
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS printerfilaments (
+            printer_id INTEGER,
+            material_id INTEGER,
+            
+            FOREIGN KEY (printer_id)
+                REFERENCES printer_models (model_id),
+                
+            FOREIGN KEY (material_id)
+                REFERENCES filaments (filament_id),
+                
+            PRIMARY KEY (printer_id,material_id)
+            )''') 
+        
+    def add_relations(self,printer_id, material_ids:list):
+        for material_id in material_ids:
+            self.cursor.execute('INSERT INTO printerfilaments VALUES (?,?)',printer_id,material_id)
 
 class Logs:
     def __init__(self, database):
