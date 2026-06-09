@@ -550,6 +550,7 @@ class AccountPage(ctk.CTkFrame):
             self.c_add_pass_entry.configure(border_color="red")
             
     def submit_edit(self):
+        """save edit form to database"""
         try:
             check = [len(self.edit_id.get().strip())==6,
                     self.edit_fname.get().strip() != "",
@@ -562,10 +563,10 @@ class AccountPage(ctk.CTkFrame):
                 self.reset_edit()
                 self.update_view()
             else:
-                self.show_error()
+                pop.show_error("all fields must be filled")
         except Exception as e:
             print(e)
-            self.show_error
+            pop.show_error("unable to save")
     
     def reset_edit(self):
         self.edit_id.set("")
