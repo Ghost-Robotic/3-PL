@@ -61,7 +61,7 @@ class Login(ctk.CTkFrame):
         # username entry
         validate_id = self.register(self.validate_id)
         
-        user_label = ctk.CTkLabel(login_cont, text="Username:", font=("Segoe UI Black",18))
+        user_label = ctk.CTkLabel(login_cont, text="ID Number:", font=("Segoe UI Black",18))
         user_label.grid(row=2, column = 0, padx=5, pady=(10,2), sticky="w")
         self.username = ctk.CTkEntry(login_cont, width=300, height=25, placeholder_text="ID number", font=(style.normal_font,18,"bold"),
                                      validate="key", validatecommand=(validate_id, "%P"))
