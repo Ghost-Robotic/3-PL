@@ -252,8 +252,26 @@ class Filaments:
         name = result[0]
         return name
     
-    def edit_filament(self):
-        pass
+    def fetch_weight(self,id):
+        row = self.cursor.execute('SELECT weight FROM filaments WHERE filament_id = ?',(id,))
+        result = row.fetchone()
+        weight = result[0]
+        return weight
+    
+    def fetch_amount(self,id):
+        row = self.cursor.execute('SELECT amount FROM filaments WHERE filament_id = ?',(id,))
+        result = row.fetchone()
+        amount = result[0]
+        return amount
+    
+    def fetch_all_filaments(self):
+        filaments = []
+        for row in self.cursor.execute('SELECT filament_id, material FROM filaments'):
+            filaments.append(f"{row[0]} {row[1]}")
+        return filaments
+    
+    def edit_filament(self, filament_id, material, weight, amount):
+        self.cursor.execute('UPDATE filaments SET material=?, weight=?, amount=? WHERE filament_id=?', (material,weight,amount,filament_id))
 
 class Logs:
     def __init__(self, database):
