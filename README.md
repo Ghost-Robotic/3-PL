@@ -5,8 +5,8 @@
 
 |Access Level|Authorised Actions|
 | --- | --- |
-| 5 | Admin access: can create accounts and authorise users |
-| 4 | can view all accounts, add new printers and materials |
+| 5 | Admin access: can create/edit accounts and authorise users, add new printers |
+| 4 | can view all accounts, add new materials |
 | 3 | can view logs |
 | 2 | can add logs |
 | 1 | can only view materials and printers |
