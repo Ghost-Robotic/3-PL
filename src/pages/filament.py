@@ -316,7 +316,7 @@ class FilamentPage(ctk.CTkFrame):
         self.edit_box.grid_remove()
         
     def validate_num(self, num):
-        return num.isdigit() or num == ""
+        return (num.isdigit() and int(num)<1000000) or num == ""
     
     def default_zero(self, var):
         if var.get() == "":
