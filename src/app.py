@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from os import system, name
 import os
 import sys
 from src.login import Login 
@@ -76,7 +77,11 @@ class App(ctk.CTk):
     # initialise program
     def start(self): 
         ctk.set_appearance_mode('dark') # force darkmode
-        self.after(1, lambda : self.state('zoomed')) # fullscreen window
+        try:
+            system(self.after(1, self.wm_state ,('zoomed')) if name == 'nt' else self.attributes('-zoomed', True))
+        except Exception as e:
+            print(e)
+        #self.after(1, lambda : self.state('zoomed')) # fullscreen window
         self.mainloop() # start tkinter loop
         
     # display dashboard if login is successful
