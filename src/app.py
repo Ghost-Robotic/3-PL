@@ -72,13 +72,13 @@ class App(ctk.CTk):
     # display given page    
     def display_page(self, frame=None):
         page = self.frames[frame]
-        page.tkraise()                        
+        page.tkraise()          
         
     # initialise program
     def start(self): 
         ctk.set_appearance_mode('dark') # force darkmode
-        try:
-            system(self.after(1, self.wm_state ,('zoomed')) if name == 'nt' else self.attributes('-zoomed', True))
+        try: # fullscreen window, cross-platform compatible
+            self.after(1, lambda: self.state('zoomed') if name == 'nt' else self.attributes('-zoomed', True))
         except Exception as e:
             print(e)
         #self.after(1, lambda : self.state('zoomed')) # fullscreen window
