@@ -21,9 +21,9 @@ class Log(ctk.CTkFrame):
         options = []
         if self.controller.auth_level != None:
             if self.controller.auth_level >= 3:
-                options = [" Add "," View "]
+                options = [" Add Print Job "," Print History "]
             elif self.controller.auth_level >= 2:
-                options = [" Add "]
+                options = [" Add Print Job "]
             else:
                 options = [" No Access "]
         option_button = ctk.CTkSegmentedButton(topbar, width=200, values=options, 
@@ -34,7 +34,7 @@ class Log(ctk.CTkFrame):
         option_button.grid(row=0,column=0, sticky="w",padx=25)        
         if " No Access " not in options:
 
-            option_button.set(" Add ")
+            option_button.set(" Add Print Job ")
         
         line = ctk.CTkFrame(topbar, height=5, fg_color="#585858")
         line.grid(row=1,column=0, sticky="we", padx=10, pady=(10,0))
@@ -107,10 +107,10 @@ class Log(ctk.CTkFrame):
 #=================================================================================
     def switch_subpage(self,page):
         match page:
-            case " Add ":
+            case " Add Print Job ":
                 self.remove_view()
                 self.grid_add()
-            case " View ":
+            case " Print History ":
                 self.remove_add()
                 self.grid_view()
 

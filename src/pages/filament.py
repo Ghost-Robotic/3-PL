@@ -22,16 +22,16 @@ class FilamentPage(ctk.CTkFrame):
         options = []
         if self.controller.auth_level != None:
             if self.controller.auth_level >= 4:
-                options = [" View "," Add "," Edit "]
+                options = [" Filament Materials "," Add Material "," Edit Material "]
             else:
-                options = [" View "]
+                options = [" Filament Materials "]
         option_button = ctk.CTkSegmentedButton(topbar, width=200, values=options, 
                                                font=(style.normal_font, 22), text_color="white",
                                                selected_color=style.main_blue, selected_hover_color=style.hover_blue,
                                                border_width=0, corner_radius=10,
                                                command=self.switch_subpage)
         option_button.grid(row=0,column=0, sticky="w",padx=25)
-        option_button.set(" View ")
+        option_button.set(" Filament Materials ")
         
         line = ctk.CTkFrame(topbar, height=5, fg_color="#585858")
         line.grid(row=1,column=0, sticky="we", padx=10, pady=(10,0))
@@ -154,7 +154,7 @@ class FilamentPage(ctk.CTkFrame):
         
 #=================================================================================
         # edit page
-        self.edit_box = ctk.CTkFrame(content_box,fg_color=style.dark_foreground)
+        self.edit_box = ctk.CTkScrollableFrame(content_box,fg_color=style.dark_foreground)
         self.edit_box.grid(row=0, column=0, sticky="nsew")
         self.edit_box.columnconfigure(0, weight=1)
         self.edit_box.rowconfigure(0, weight=1)
@@ -197,7 +197,7 @@ class FilamentPage(ctk.CTkFrame):
         id_entry.grid(row=0, column=1)
         
         name_frame = ctk.CTkFrame(edit_frame, fg_color=style.dark_foreground)
-        name_frame.grid(row=2,column=0, padx=40, pady=(30,12),sticky="nw")
+        name_frame.grid(row=2,column=0, padx=40, pady=(10,12),sticky="nw")
         name_frame.columnconfigure(1, weight=1)
         name_label = ctk.CTkLabel(name_frame, text="Material Name:", font=(style.normal_font, 25, "bold"), text_color="white")
         name_label.grid(row=0, column=0, padx=(0,20))
@@ -249,15 +249,15 @@ class FilamentPage(ctk.CTkFrame):
 #=================================================================================
     def switch_subpage(self,page):
         match page:
-            case " View ":
+            case " Filament Materials ":
                 self.remove_add()
                 self.remove_edit()
                 self.grid_view()
-            case " Add ":
+            case " Add Material ":
                 self.remove_view()
                 self.remove_edit()
                 self.grid_add()
-            case " Edit ":
+            case " Edit Material ":
                 self.remove_view()
                 self.remove_add()
                 self.grid_edit()

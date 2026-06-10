@@ -22,16 +22,16 @@ class PrintersPage(ctk.CTkFrame):
         options = []
         if self.controller.auth_level != None:
             if self.controller.auth_level >= 5:
-                options = [" View "," Add "]
+                options = [" Printer Models "," Add Printer "]
             else:
-                options = [" View "]
+                options = [" Printer Models "]
         option_button = ctk.CTkSegmentedButton(topbar, width=200, values=options, 
                                                font=(style.normal_font, 22), text_color="white",
                                                selected_color=style.main_blue, selected_hover_color=style.hover_blue,
                                                border_width=0, corner_radius=10,
                                                command=self.switch_subpage)
         option_button.grid(row=0,column=0, sticky="w",padx=25)
-        option_button.set(" View ")
+        option_button.set(" Printer Models ")
         
         line = ctk.CTkFrame(topbar, height=5, fg_color="#585858")
         line.grid(row=1,column=0, sticky="we", padx=10, pady=(10,0))
@@ -154,10 +154,10 @@ class PrintersPage(ctk.CTkFrame):
 #=================================================================================
     def switch_subpage(self,page):
         match page:
-            case " View ":
+            case " Printer Models ":
                 self.remove_add()
                 self.grid_view()
-            case " Add ":
+            case " Add Printer ":
                 self.remove_view()
                 self.grid_add()
     
