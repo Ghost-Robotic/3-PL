@@ -72,7 +72,7 @@ class Login(ctk.CTkFrame):
         # password entry
         pass_label = ctk.CTkLabel(login_cont, text="Password:", font=("Segoe UI Black",18))
         pass_label.grid(row=4, column = 0, padx=5, pady=(10,2), sticky="w")
-        self.password = ctk.CTkEntry(login_cont, width=300, height=25, show="•", placeholder_text="Password", font=(style.normal_font,18,"bold"))
+        self.password = ctk.CTkEntry(login_cont, width=300, height=25, show="●", placeholder_text="Password", font=(style.normal_font,18,"bold"))
         self.password.grid(row=5, column=0, padx=5, pady=(2, 10), sticky="w")
         self.password.bind("<Return>", lambda event : self.submit())
         
