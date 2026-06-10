@@ -95,7 +95,7 @@ class Login(ctk.CTkFrame):
         help_button.grid(row=7, column=1, sticky="e")
         
         # help message
-        self.help_label = ctk.CTkLabel(login_cont, text="All login information is managed by your organisation's admin, \nplease see them for any assistance required",
+        self.help_label = ctk.CTkLabel(login_cont, text="Login details are managed by your organisation's admin. Please see them for assistance",
                                   font=(style.normal_font, 16), text_color="#ececec", wraplength=300)
         self.help_label.grid(row=8, column=0, columnspan=2)
         self.help_label.grid_remove()
