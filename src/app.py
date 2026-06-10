@@ -4,7 +4,7 @@ import os
 import sys
 from src.login import Login 
 from src.dashboard import Dashboard
-from src.database import Users, Logs, PrinterModels, Printers, Filaments
+from src.database import PrinterFilaments, Users, Logs, PrinterModels, Printers, Filaments
 import src.database as db
 from PIL import Image, ImageTk
 import src.style as style
@@ -68,6 +68,7 @@ class App(ctk.CTk):
         self.printer_models = PrinterModels(self.database)
         self.printers = Printers(self.database)
         self.filaments = Filaments(self.database)
+        self.printer_filament = PrinterFilaments(self.database)
            
     # display given page    
     def display_page(self, frame=None):
