@@ -153,7 +153,7 @@ class PrintersPage(ctk.CTkFrame):
         filament_frame.grid(row=2,column=1, padx=40, pady=(30,12), sticky="nw")
         select_label = ctk.CTkLabel(filament_frame, text="Select compatible filaments:", font=(style.normal_font, 20, "bold"), text_color="white")
         select_label.grid(row=0,column=0,sticky="nw", pady=(0,5))
-        self.add_border_box = ctk.CTkFrame(filament_frame, fg_color=style.main_blue, corner_radius=5)
+        self.add_border_box = ctk.CTkFrame(filament_frame, fg_color=style.main_blue, corner_radius=10)
         self.add_border_box.grid(row=1,column=0, sticky="n")
         self.grid_scroll_options(frame=self.add_border_box, options=self.filament_options)
         
@@ -246,7 +246,7 @@ class PrintersPage(ctk.CTkFrame):
         filament_frame.grid(row=3,column=1, padx=40, pady=(30,12), sticky="nw")
         select_label = ctk.CTkLabel(filament_frame, text="Select compatible filaments:", font=(style.normal_font, 20, "bold"), text_color="white")
         select_label.grid(row=0,column=0,sticky="nw", pady=(0,5))
-        self.edit_border_box = ctk.CTkFrame(filament_frame, fg_color=style.main_blue, corner_radius=5)
+        self.edit_border_box = ctk.CTkFrame(filament_frame, fg_color=style.main_blue, corner_radius=10)
         self.edit_border_box.grid(row=1,column=0, sticky="n")
         self.grid_scroll_options(frame=self.edit_border_box, options=self.edit_filament_options)
         
