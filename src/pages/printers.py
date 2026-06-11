@@ -227,7 +227,7 @@ class PrintersPage(ctk.CTkFrame):
         self.brand_entry.grid(row=0, column=1)
         
         name_frame = ctk.CTkFrame(edit_frame, fg_color=style.dark_foreground)
-        name_frame.grid(row=2,column=1, padx=20, pady=(30,12),sticky="nw")
+        name_frame.grid(row=2,column=1, padx=20, pady=(0,12),sticky="nw")
         name_frame.columnconfigure(1, weight=1)
         name_label = ctk.CTkLabel(name_frame, text="Model:", font=(style.normal_font, 22, "bold"), text_color="white")
         name_label.grid(row=0, column=0, padx=(0,20))
@@ -336,9 +336,6 @@ class PrintersPage(ctk.CTkFrame):
     def grid_add(self):
         self.reset_form()
         self.filaments = self.controller.filaments.list_id_names()
-        for widget in self.add_border_box.winfo_children():
-            widget.destroy()
-        self.grid_scroll_options(frame=self.add_border_box, options=self.filament_options)
         self.add_box.grid()
         
     # hide subpage to add printers    
@@ -348,10 +345,6 @@ class PrintersPage(ctk.CTkFrame):
     # display subpage to edit printers
     def grid_edit(self):
         self.reset_edit()
-        self.filaments = self.controller.filaments.list_id_names()
-        for widget in self.add_border_box.winfo_children():
-            widget.destroy()
-        self.grid_scroll_options(frame=self.add_border_box, options=self.edit_filament_options)
         self.edit_box.grid()
         
     # hide subpage to edit printers    
@@ -402,6 +395,9 @@ class PrintersPage(ctk.CTkFrame):
         self.brand.set("")
         self.model_name.set("")
         self.multi_material.set(False)
+        self.all_models = self.controller.printer_models.fetch_all_models()
+        self.avail_models = self.all_models
+        
         self.hide_error
         
     def submit_edit(self):
@@ -417,7 +413,7 @@ class PrintersPage(ctk.CTkFrame):
                         
                 self.controller.printer_models.edit_model(model_id=self.edit_id.get(),brand=self.edit_brand.get(), model_name=self.edit_model_name.get(), 
                                                           multimaterial=self.edit_multi_material.get(), material_ids=compatible_fil)
-                                
+                          
                 self.reset_edit()
                 pop.show_success(self, self.controller)
                 self.update_view()
@@ -431,6 +427,8 @@ class PrintersPage(ctk.CTkFrame):
         self.filaments = self.controller.filaments.list_id_names()
         for widget in self.edit_border_box.winfo_children():
             widget.destroy()
+        self.all_models = self.controller.printer_models.fetch_all_models()
+        self.avail_models = self.all_models
         self.edit_filament_options = {}    
         self.grid_scroll_options(frame=self.edit_border_box,options=self.edit_filament_options)
         self.edit_id.set("")
