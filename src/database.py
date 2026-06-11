@@ -17,6 +17,7 @@ class Users():
         self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
+        # create table to store user accounts
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             user_id TEXT PRIMARY KEY CHECK(length(user_id)=6),
@@ -75,8 +76,7 @@ class Users():
                                      WHERE user_id =?''',(user_id,))
         
         row = result.fetchone()
-        name = row[0][0].upper()+row[0][1:]+ " " + row[1][0].upper()+row[1][1:]
-        return name.title()
+        return row[0].title(), row[1].title() # fname,lname
     
     def fetch_table(self):
         rows = []
@@ -95,6 +95,15 @@ class Users():
         for row in self.cursor.execute('SELECT user_id FROM users'):
             id.append(row[0])
         return id
+    
+    def fetch_all_accounts(self):
+        account = []
+        for row in self.cursor.execute('SELECT user_id, f_name, l_name FROM users'):
+            account.append(f"{row[0]} {row[1].title()} {row[2].title()}")
+        return account
+    
+    def edit_user(self, user_id, f_name, l_name, access_level):
+        self.cursor.execute('UPDATE users SET f_name=?, l_name=?, access_level=? WHERE user_id=?', (f_name,l_name,access_level,user_id))
         
 class Groups():
     def __init__(self, database):
@@ -123,6 +132,7 @@ class PrinterModels:
         self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
+        # create table to store information about printer models
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS printer_models (
             model_id INTEGER PRIMARY KEY,
@@ -147,6 +157,15 @@ class PrinterModels:
             rows.append(row)
         return rows  
     
+    def fetch_table(self):
+        rows = []
+        for row in self.cursor.execute('SELECT model_id, model_name, brand, multimaterial FROM printer_models'):
+            columns = []
+            for item in row:
+                columns.append(item)
+            rows.append(columns)
+        return rows  
+    
     def fetch_all_names(self):
         rows = []
         for row in self.cursor.execute('SELECT model_name FROM printer_models'):
@@ -169,11 +188,39 @@ class PrinterModels:
         else:
             raise Exception("Model not found")
         
-    def fetch_name(self, id):
-        row = self.cursor.execute('SELECT brand, model_name FROM printer_models WHERE model_id = ?',(id,))
+    def fetch_model_name(self, id):
+        row = self.cursor.execute('SELECT model_name FROM printer_models WHERE model_id = ?',(id,))
         result = row.fetchone()
-        name = result[0] +" "+ result[1]
+        name = result[0]
         return name
+    
+    def fetch_brand(self, id):
+        row = self.cursor.execute('SELECT brand FROM printer_models WHERE model_id = ?',(id,))
+        result = row.fetchone()
+        brand = result[0]
+        return brand
+    
+    def edit_model(self, model_id, model_name, brand, multimaterial, material_ids):
+        self.cursor.execute('UPDATE printer_models SET model_name=?, brand=?, multimaterial=? WHERE model_id=?', (model_name,brand,multimaterial,model_id))
+        
+        self.cursor.execute('DELETE from printerfilaments WHERE printer_id=?',(model_id,))
+        for material_id in material_ids:
+            self.cursor.execute('INSERT INTO printerfilaments VALUES (?,?)',(model_id,material_id,))
+            
+    def fetch_all_models(self):
+        model = []
+        for row in self.cursor.execute('SELECT model_id, brand, model_name FROM printer_models'):
+            model.append(f"{row[0]} {row[1]} {row[2]}")
+        return model
+    
+    def is_mm(self, model_id):
+        """Check if printer is multi-material capable"""
+        result = self.cursor.execute('''SELECT multimaterial 
+                                     FROM printer_models 
+                                     WHERE model_id =?''',(model_id,))
+        
+        row = result.fetchone()
+        return row[0]
     
 
 class Printers:
@@ -206,6 +253,7 @@ class Filaments:
         self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
+        # create table to store information about filaments
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS filaments (
             filament_id INTEGER PRIMARY KEY,
@@ -240,6 +288,81 @@ class Filaments:
         result = row.fetchone()
         name = result[0]
         return name
+    
+    def list_id_names(self):
+        id_names = []
+        for row in self.cursor.execute('SELECT filament_id,material FROM filaments ORDER BY material ASC'):
+            id_names.append([row[0],row[1]])
+        return id_names
+    
+    def fetch_weight(self,id):
+        row = self.cursor.execute('SELECT weight FROM filaments WHERE filament_id = ?',(id,))
+        result = row.fetchone()
+        weight = result[0]
+        return weight
+    
+    def fetch_amount(self,id):
+        row = self.cursor.execute('SELECT amount FROM filaments WHERE filament_id = ?',(id,))
+        result = row.fetchone()
+        amount = result[0]
+        return amount
+    
+    def fetch_all_filaments(self):
+        filaments = []
+        for row in self.cursor.execute('SELECT filament_id, material FROM filaments'):
+            filaments.append(f"{row[0]} {row[1]}")
+        return filaments
+    
+    def edit_filament(self, filament_id, material, weight, amount):
+        self.cursor.execute('UPDATE filaments SET material=?, weight=?, amount=? WHERE filament_id=?', (material,weight,amount,filament_id))
+        
+class PrinterFilaments:
+    def __init__(self, database):
+        self.connection =sql.connect(database, autocommit=True)
+        self.connection.execute('PRAGMA foreign_keys = ON')
+        self.cursor = self.connection.cursor()
+        
+        # create table to connect printer models and filaments
+        self.cursor.execute('''
+        CREATE TABLE IF NOT EXISTS printerfilaments (
+            printer_id INTEGER,
+            material_id INTEGER,
+            
+            FOREIGN KEY (printer_id)
+                REFERENCES printer_models (model_id),
+                
+            FOREIGN KEY (material_id)
+                REFERENCES filaments (filament_id),
+                
+            PRIMARY KEY (printer_id,material_id)
+            )''') 
+        
+    def add_relations(self,printer_id, material_ids:list):
+        for material_id in material_ids:
+            self.cursor.execute('INSERT INTO printerfilaments VALUES (?,?)',(printer_id,material_id,))
+            
+    def fetch_filaments_names(self, printer_id):
+        printer_filaments = []
+        for row in self.cursor.execute('''SELECT f.material 
+                                       FROM filaments AS f
+                                       JOIN printerfilaments AS pf ON f.filament_id = pf.material_id
+                                       JOIN printer_models AS p ON pf.printer_id = p.model_id
+                                       WHERE p.model_id = ?''',(printer_id,)):
+            printer_filaments.append(row[0])
+            
+        return printer_filaments
+    
+    def fetch_filaments_id(self, printer_id):
+        printer_filaments = []
+        for row in self.cursor.execute('''SELECT f.filament_id 
+                                       FROM filaments AS f
+                                       JOIN printerfilaments AS pf ON f.filament_id = pf.material_id
+                                       JOIN printer_models AS p ON pf.printer_id = p.model_id
+                                       WHERE p.model_id = ?''',(printer_id,)):
+            printer_filaments.append(row[0])
+            
+        return printer_filaments
+        
 
 class Logs:
     def __init__(self, database):
@@ -301,8 +424,11 @@ class Logs:
             columns = []
             columns.append(str(row[0]))
             
-            name = str(row[1]) + " " + str(row[2])
-            columns.append(name)
+            fname = str(row[1])
+            lname = str(row[2])
+            
+            name = f"{fname} {lname}"
+            columns.append(name.title())
             
             columns.append(row[3])
 

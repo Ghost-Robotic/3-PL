@@ -61,7 +61,7 @@ class Login(ctk.CTkFrame):
         # username entry
         validate_id = self.register(self.validate_id)
         
-        user_label = ctk.CTkLabel(login_cont, text="Username:", font=("Segoe UI Black",18))
+        user_label = ctk.CTkLabel(login_cont, text="ID Number:", font=("Segoe UI Black",18))
         user_label.grid(row=2, column = 0, padx=5, pady=(10,2), sticky="w")
         self.username = ctk.CTkEntry(login_cont, width=300, height=25, placeholder_text="ID number", font=(style.normal_font,18,"bold"),
                                      validate="key", validatecommand=(validate_id, "%P"))
@@ -72,7 +72,7 @@ class Login(ctk.CTkFrame):
         # password entry
         pass_label = ctk.CTkLabel(login_cont, text="Password:", font=("Segoe UI Black",18))
         pass_label.grid(row=4, column = 0, padx=5, pady=(10,2), sticky="w")
-        self.password = ctk.CTkEntry(login_cont, width=300, height=25, show="•", placeholder_text="Password", font=(style.normal_font,18,"bold"))
+        self.password = ctk.CTkEntry(login_cont, width=300, height=25, show="●", placeholder_text="Password", font=(style.normal_font,18,"bold"))
         self.password.grid(row=5, column=0, padx=5, pady=(2, 10), sticky="w")
         self.password.bind("<Return>", lambda event : self.submit())
         
@@ -95,7 +95,7 @@ class Login(ctk.CTkFrame):
         help_button.grid(row=7, column=1, sticky="e")
         
         # help message
-        self.help_label = ctk.CTkLabel(login_cont, text="All login information is managed by your organisation's admin, \nplease see them for any assistance required",
+        self.help_label = ctk.CTkLabel(login_cont, text="Login details are managed by your organisation's admin. Please see them for assistance",
                                   font=(style.normal_font, 16), text_color="#ececec", wraplength=300)
         self.help_label.grid(row=8, column=0, columnspan=2)
         self.help_label.grid_remove()
@@ -137,6 +137,8 @@ class Login(ctk.CTkFrame):
     def validate_id(self, id):
         if id == "ID number":
             return True
+        elif len(str(id)) > 6:
+            return False
         return id.isdigit() or id==""
         
     def submit(self):

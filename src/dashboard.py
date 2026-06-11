@@ -10,7 +10,7 @@ from src.pages.account import AccountPage
 from src.pages.printers import PrintersPage
 from src.pages.filament import FilamentPage
 from src.helpers.loading import Loading
-from src.database import Users, Logs, PrinterModels, Printers, Filaments
+from src.database import PrinterFilaments, Users, Logs, PrinterModels, Printers, Filaments
 # main page that allows users to access sub-pages that contain main app functions
 
 class Dashboard(ctk.CTkFrame):
@@ -225,6 +225,7 @@ if __name__ == "__main__":
             self.printer_models = PrinterModels(self.database)
             self.printers = Printers(self.database)
             self.filaments = Filaments(self.database)
+            self.printer_filament = PrinterFilaments(self.database)
             
             
             dashboard = Dashboard(self,self)

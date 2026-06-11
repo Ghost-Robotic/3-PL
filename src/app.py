@@ -1,20 +1,14 @@
 import customtkinter as ctk
+from os import system, name
 import os
 import sys
 from src.login import Login 
 from src.dashboard import Dashboard
-from src.database import Users, Logs, PrinterModels, Printers, Filaments
+from src.database import PrinterFilaments, Users, Logs, PrinterModels, Printers, Filaments
 import src.database as db
 from PIL import Image, ImageTk
 import src.style as style
 from src.helpers.loading import Loading
-
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except AttributeError:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
 
 class App(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -25,12 +19,14 @@ class App(ctk.CTk):
         self.auth_level = None
         ctk.CTk.__init__(self, *args, **kwargs)
         #self.bind("<Configure>", self.on_resize)
+        
         # configure window
-        self.title("3-PL")
+        self.title("3-PL") # add topbar title
         # logo = Image.open(r"assets/v2logo.png")
         # icon_sizes = [(16, 16), (32, 32), (48, 48), (64, 64)]
-        # logo.save('v2logo.ico', format='ICO', sizes=icon_sizes)
-        self.iconbitmap(r"assets/v2logo.ico")
+        # logo.save('v2logo.ico', format='ICO', sizes=icon_sizes) #create .ico of icon
+        
+        self.iconbitmap(r"assets/v2logo.ico") # add taskbar icon
         icon = ImageTk.PhotoImage((Image.open(r"assets/v2logo.png")))
         self.iconphoto(True,icon)
         #system(self.after(1, self.wm_state ,('zoomed')) if name == 'nt' else self.attributes('-zoomed', True))
@@ -44,6 +40,7 @@ class App(ctk.CTk):
         self.container.rowconfigure(0, weight=1)
         self.container.columnconfigure(0, weight=1)
         
+        #loading animation
         frame = Loading(self,self)
         frame.grid(row=0, column=0, sticky="nsew")
         frame.grid_triple()         
@@ -67,16 +64,21 @@ class App(ctk.CTk):
         self.printer_models = PrinterModels(self.database)
         self.printers = Printers(self.database)
         self.filaments = Filaments(self.database)
+        self.printer_filament = PrinterFilaments(self.database)
            
     # display given page    
     def display_page(self, frame=None):
         page = self.frames[frame]
-        page.tkraise()                        
+        page.tkraise()          
         
     # initialise program
     def start(self): 
         ctk.set_appearance_mode('dark') # force darkmode
-        self.after(1, lambda : self.state('zoomed')) # fullscreen window
+        try: # fullscreen window, cross-platform compatible
+            self.after(1, lambda: self.state('zoomed') if name == 'nt' else self.attributes('-zoomed', True))
+        except Exception as e:
+            print(e)
+        #self.after(1, lambda : self.state('zoomed')) # fullscreen window
         self.mainloop() # start tkinter loop
         
     # display dashboard if login is successful

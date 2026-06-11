@@ -27,7 +27,7 @@ for i in filament_types:
     filaments.add_filament(material=i, amount=random.randint(0,10))
 filaments.view_table()
 
-printer_types = [("CORE One L","Prusa",False),("CORE One","Prusa",False),("XL 5 Tool","Prusa",True),("HT90","Prusa",False),("H2D","Bambu Lab",True),("P1S","Bambu Lab",False),("U1","Snapmaker",True),("Omni TECH+","Omni3D",False),("FUSE 1+","formlabs",False),("Form 4L","formlabs",False)]
+printer_types = [("CORE One L","Prusa",False),("CORE One","Prusa",False),("XL 5 Tool","Prusa",True),("HT90","Prusa",False),("H2D","Bambu Lab",True),("P1S","Bambu Lab",False),("U1","Snapmaker",True),("Omni TECH+","Omni3D",True),("FUSE 1+","formlabs",False),("Form 4L","formlabs",False)]
 
 for i in printer_types:
     printer_models.add_printer_model(model_name=i[0],brand=i[1],multimaterial=i[2])
