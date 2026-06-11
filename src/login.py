@@ -137,6 +137,8 @@ class Login(ctk.CTkFrame):
     def validate_id(self, id):
         if id == "ID number":
             return True
+        elif len(str(id)) > 6:
+            return False
         return id.isdigit() or id==""
         
     def submit(self):
