@@ -438,6 +438,7 @@ class PrintersPage(ctk.CTkFrame):
         self.edit_dropdown.set("")
         
     def grid_scroll_options(self, frame, options:dict):
+        """creates and stores the frames to select compatible filaments for a printer"""
         scroll_frame = ctk.CTkScrollableFrame(frame, fg_color=style.dark_foreground, width=300, height=300, corner_radius=10)
         scroll_frame.grid(row=0,column=0, sticky="nsew", padx=3,pady=3)
         

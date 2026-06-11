@@ -17,6 +17,7 @@ class Users():
         self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
+        # create table to store user accounts
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             user_id TEXT PRIMARY KEY CHECK(length(user_id)=6),
@@ -131,6 +132,7 @@ class PrinterModels:
         self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
+        # create table to store information about printer models
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS printer_models (
             model_id INTEGER PRIMARY KEY,
@@ -251,6 +253,7 @@ class Filaments:
         self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
+        # create table to store information about filaments
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS filaments (
             filament_id INTEGER PRIMARY KEY,
@@ -319,6 +322,7 @@ class PrinterFilaments:
         self.connection.execute('PRAGMA foreign_keys = ON')
         self.cursor = self.connection.cursor()
         
+        # create table to connect printer models and filaments
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS printerfilaments (
             printer_id INTEGER,
