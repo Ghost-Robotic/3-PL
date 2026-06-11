@@ -25,15 +25,30 @@
 **Name**: Amelia Smith  
 **id**: 246246  
 **password**: password123  
-**access_level**: 4  
+**access_level**: 3  
 
 **Name**: Olivia Doe  
 **id**: 135135  
 **password**: qwerty  
-**access_level**: 4  
+**access_level**: 2  
 
 **Name**: Bob Builder  
 **id**: 654321  
 **password**: password  
 **access_level**: 1  
 
+|ID|Name|Password|Access Level|
+| --- | --- | --- | :---: |
+| 123456 | John Doe | admin | 5 |
+| 987654 | Thomas Smith | 123456 | 4 |
+| 246246 | Amelia Smith | password123 | 3 |
+| 135135 | Olivia Doe | qwerty | 2 |
+| 654321 | Bob Builder | password | 1 |
+| 396886 | Carina Collins | password1 | 4 |
+| 321321 | Christian Janis | password2 | 2 |
+| 123123 | Beth Jang | password3 | 3 |
+| 654123 | Jane Dough | password4 | 1 |
+| 903123 | Ellen Joe | password5 | 3 |
+| 687345 | Dan Tedum | password6 | 4 |
+| 987456 | Jenny Maud | password7 | 3 |
+| 763957 | Tray Aurus | password8 | 2 |
